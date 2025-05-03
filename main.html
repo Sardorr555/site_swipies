@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Create new agent</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css">
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="js_app/main.js" defer></script>
+</head>
+<body>
+  <div class="header">
+    
+    <div class="modes">
+      <span class="mode active">Spot</span>
+      <span class="mode">Pro</span>
+    </div>
+
+    <div class="profile-img-wrapper">
+      <img id="profileImg" class="profile-img" src="" alt="Profile" />
+    </div>
+  </div>
+
+  <div class="container">
+    <aside class="sidebar">
+      <ul>
+        <li onclick="showTab('files')" class="active">📁 Files</li>
+        <li onclick="showTab('text')">📝 Text</li>
+        <li onclick="showTab('website')">🌐 Website</li>
+        <li onclick="showTab('qa')">🔒 Q&A</li>
+      </ul>
+    </aside>
+  
+    <main class="main">
+      <div id="files" class="tab-content active">
+        <h2>Files</h2>
+        <p>Загрузка файлов, PDF, DOC и т.д.</p>
+      </div>
+  
+      
+    <div id="text" class="tab-content">
+      <h1>Create new agent</h1>
+      <div class="input-box">
+        <h2>Text</h2>
+        <textarea placeholder="Enter text ..."></textarea>
+      </div>
+    </div>
+
+  
+      <div id="website" class="tab-content">
+        <h2>Website</h2>
+        <p>Укажите URL веб-сайта для анализа.</p>
+      </div>
+  
+      <div id="qa" class="tab-content">
+        <h2>Q&A</h2>
+        <p>Задайте вопросы и ответы вручную.</p>
+      </div>
+  
+      
+    </main>
+  </div>
+
+  
+    <div class="sidebar-right">
+      <h3>SOURCES</h3>
+      <div class="stats">Total size: <strong>0 B</strong><br> / 400 KB</div>
+      <button class="create-button">Create agent</button>
+    </div>
+  </div>
+</body>
+</html>

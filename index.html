@@ -29,6 +29,8 @@
     <!--Google Webfonts-->
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700,800' rel='stylesheet' type='text/css'>
 </head>
+
+
 <body>
 
 <!-- Preloader -->
@@ -52,9 +54,11 @@
 
     <header id="banner" class="scrollto clearfix" data-enllax-ratio=".5">
         <div id="header" class="nav-collapse">
+            
             <div class="row clearfix">
                 <div class="col-1">
 
+                    
                     <!--Logo-->
                     <div id="logo">
 
@@ -69,34 +73,20 @@
                     </div>
                     <!--End of Logo-->
 
+                    
                     <aside>
 
-                        <!--Social Icons in Header-->
-                        <ul class="social-icons">
-                            
-                            <li>
-                                <a target="_blank" title="Twitter" href="https://x.com/albakiev_s">
-                                    <i class="fa fa-twitter fa-2x"></i><span>Twitter</span>
-                                </a>
-                            </li>
+                        <!-- Auth Buttons -->
+                     <!-- Auth Buttons -->
+                        <div id="auth-buttons" class="auth-buttons" style="margin-bottom: 20px;">
+                            <a href="signup.html" class="button" style="font-size: small;">Sign Up</a>
+                            <a href="login.html" class="button" style="font-size: small;">Login</a>
+                        </div>
 
-                            <li>
-                                <a target="_blank" title="Instagram" href="https://www.instagram.com/albakiev.s/">
-                                    <i class="fa fa-instagram fa-2x"></i><span>Instagram</span>
-                                </a>
-                            </li>
 
-                            
-                            <li>
-                                <a target="_blank" title="Instagram" href="https://github.com/Sardorr555">
-                                    <i class="fa fa-github fa-2x"></i><span>Instagram</span>
-                                </a>
-                            </li>
-                            
-                        </ul>
-                        <!--End of Social Icons in Header-->
-
-                    </aside>
+                        </aside>
+    
+                    
 
                     <!--Main Navigation-->
                     <nav id="nav-main">
@@ -120,7 +110,12 @@
                             <li>
                                 <a href="#pricing">Product</a>
                             </li>
+                            <li>
+                                <a href="#"> Documentation</a>
+                            </li>
                         </ul>
+
+                        
                     </nav>
                     <!--End of Main Navigation-->
 
@@ -144,8 +139,7 @@ using the Refine Tuning methodology.</h2>
                 </div>
 
                 <!--Call to Action-->
-                <a href="chat.html" class="button">START CHATING TODAY!</a>
-                <!--End Call to Action-->
+                <button id="start-btn" class="button">START Now!</button>
 
             </div>
 
@@ -283,44 +277,6 @@ using the Refine Tuning methodology.</h2>
 
         </div>
         <!--End of Content Section-->
-
-        <!--Testimonials-->
-        <aside id="testimonials" class="scrollto text-center" data-enllax-ratio=".2">
-
-            <div class="row clearfix">
-
-                <div class="section-heading">
-                    <h3>EXPERTS</h3>
-                    <h2 class="section-title">Our Team</h2>
-                </div>
-
-                <!--User Testimonial-->
-                <blockquote class="col-3 testimonial classic">
-                    <img src="images/user-images/logoooo.jpg" alt="User"/>
-                   
-                    <footer>Albakiev Sardorbek - CEO(main dev)</footer>
-                </blockquote>
-                <!-- End of Testimonial-->
-
-                <!--User Testimonial-->
-                <blockquote class="col-3 testimonial classic">
-                    <img src="images/user-images/Назирбек.png" alt="User"/>
-                   
-                    <footer>Muhhamad-Nazir.B - Front End</footer>
-                </blockquote>
-                <!-- End of Testimonial-->
-
-                <!--User Testimonial-->
-                <blockquote class="col-3 testimonial classic">
-                    <img src="images/user-images/Исмоилбек.png" alt="User"/>
-                  <footer>Tulqinov Ismoilbek - back-end</footer>
-                </blockquote>
-                <!-- End of Testimonial-->
-
-            </div>
-
-        </aside>
-        <!--End of Testimonials-->
 
         <!--Clients-->
         <section id="clients" class="scrollto clearfix">
@@ -492,6 +448,12 @@ using the Refine Tuning methodology.</h2>
 <script src="js/images-loaded.min.js"></script>
 <script src="js/lightbox.min.js"></script>
 <script src="js/site.js"></script>
+
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="js_app/firebase_config.js"></script>
+<script type="module" src="js_app/index.js"></script> 
 
 
 </body>
