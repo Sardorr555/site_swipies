@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentation - LLM Data Platform</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Google Fonts - Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Platform Styles -->
+    <link rel="stylesheet" href="css/platform-styles.css">
+</head>
+<body>
+    <!-- Mobile Header (visible only on small screens) -->
+    <div class="mobile-header d-md-none">
+        <button class="sidebar-toggle">
+            <i class="bi bi-list"></i>
+        </button>
+        <h5>LLM Data Platform</h5>
+    </div>
+
+    <div class="container-fluid p-0">
+        <div class="row g-0">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <div class="sidebar-header">
+                    <h5>LLM Data Platform</h5>
+                    <button class="sidebar-toggle d-none d-md-block d-lg-none">
+                        <i class="bi bi-arrow-left"></i>
+                    </button>
+                </div>
+                
+                <a href="main.html" class="sidebar-item">
+                    <i class="bi bi-plus-circle"></i> <span>Create Agent</span>
+                </a>
+                
+                <a href="bots.html" class="sidebar-item">
+                    <i class="bi bi-robot"></i> <span>My Bots</span>
+                </a>
+                <a href="files.html" class="sidebar-item">
+                    <i class="bi bi-file-earmark"></i> <span>Files</span>
+                </a>
+                <a href="text.html" class="sidebar-item">
+                    <i class="bi bi-text-paragraph"></i> <span>Text</span>
+                </a>
+                <a href="website.html" class="sidebar-item">
+                    <i class="bi bi-globe"></i> <span>Website</span>
+                </a>
+                <a href="qa.html" class="sidebar-item">
+                    <i class="bi bi-chat-dots"></i> <span>Q&A</span>
+                </a>
+                <a href="telegram.html" class="sidebar-item">
+                    <i class="bi bi-telegram"></i> <span>Telegram Bot</span>
+                </a>
+                <a href="documentation.html" class="sidebar-item active">
+                    <i class="bi bi-book"></i> <span>Documentation</span>
+                </a>
+            </div>
+            
+            <!-- Main Content Area -->
+            <div class="main-content">
+                <!-- Pro/Standard Version Buttons -->
+                <div class="d-flex justify-content-center mb-4">
+                    <a href="#" class="btn btn-light me-3 px-5">Standard</a>
+                    <a href="#" class="btn btn-dark px-5">Pro</a>
+                </div>
+                
+                <div class="header">
+                    <h1>Documentation</h1>
+                </div>
+                
+                <div class="doc-section">
+                    <h3>Website Integration</h3>
+                    <p>Integrate your LLM-powered chat agent into any website with a simple script tag. Follow these steps to get started:</p>
+                    
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5>1. Create an Agent</h5>
+                            <p>Go to the <a href="/">Create Agent</a> tab and configure your agent with a name, description, and optional logo.</p>
+                            
+                            <h5>2. Add the Script to Your Website</h5>
+                            <p>Copy the generated script tag and paste it into the <code>&lt;head&gt;</code> section of your HTML:</p>
+                            <div class="code-block">
+                                <pre><code>&lt;script src="https://llm-data-platform.example.com/agent.js?id=YOUR_AGENT_ID" async&gt;&lt;/script&gt;</code></pre>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                            
+                            <h5>3. Customize Behavior (Optional)</h5>
+                            <p>You can customize the chat widget by adding a configuration object before the script:</p>
+                            <div class="code-block">
+                                <pre><code>&lt;script&gt;
+  window.LLMChatConfig = {
+    position: 'bottom-right',  // bottom-right, bottom-left, top-right, top-left
+    initialMessage: 'Hello! How can I help you today?',
+    primaryColor: '#0d6efd',
+    textColor: '#ffffff',
+    showBranding: false
+  };
+&lt;/script&gt;</code></pre>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="doc-section">
+                    <h3>Telegram Bot Integration</h3>
+                    <p>Create a Telegram bot that uses your LLM Data Platform with rug pull capabilities. This allows you to reach users through the Telegram messaging platform.</p>
+                    
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5>1. Generate an API Key</h5>
+                            <p>Go to the <a href="/telegram.html">Telegram Bot</a> tab and click "Generate API Key".</p>
+                            
+                            <h5>2. Create a Bot with BotFather</h5>
+                            <p>Open Telegram and search for @BotFather. Start a chat and use the /newbot command to create a new bot. BotFather will give you a token.</p>
+                            
+                            <h5>3. Set Up Your Bot</h5>
+                            <p>Create a new Node.js project and install the required dependencies:</p>
+                            <div class="code-block">
+                                <pre><code>npm init -y
+npm install telegraf axios dotenv</code></pre>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                            
+                            <h5>4. Create Environment File</h5>
+                            <p>Create a <code>.env</code> file with your Telegram bot token:</p>
+                            <div class="code-block">
+                                <pre><code>TELEGRAM_BOT_TOKEN=your_bot_token_from_botfather</code></pre>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                            
+                            <h5>5. Use the Generated Bot Code</h5>
+                            <p>Copy the generated bot code from the Telegram Bot tab and save it as <code>bot.js</code>.</p>
+                            
+                            <h5>6. Run Your Bot</h5>
+                            <p>Start your bot with:</p>
+                            <div class="code-block">
+                                <pre><code>node bot.js</code></pre>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="doc-section">
+                    <h3>Python Integration</h3>
+                    <p>Use your LLM Data Platform with Python applications by leveraging our API:</p>
+                    
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5>1. Install Required Packages</h5>
+                            <div class="code-block">
+                                <pre><code>pip install requests</code></pre>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                            
+                            <h5>2. Basic API Usage</h5>
+                            <div class="code-block">
+                                <pre><code>import requests
+
+# Replace with your API key and endpoint
+API_KEY = "your_api_key"
+API_URL = "https://llm-data-platform.example.com/api"
+
+# Send a query to the LLM
+def ask_question(question):
+    response = requests.post(
+        f"{API_URL}/chat",
+        json={
+            "message": question,
+            "apiKey": API_KEY
+        }
+    )
+    
+    if response.status_code == 200:
+        return response.json()["answer"]
+    else:
+        return f"Error: {response.status_code} - {response.text}"
+
+# Example usage
+question = "What is the capital of France?"
+answer = ask_question(question)
+print(f"Q: {question}\nA: {answer}")</code></pre>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                            
+                            <h5>3. Telegram Bot with Python</h5>
+                            <p>You can also create a Telegram bot using Python:</p>
+                            <div class="code-block">
+                                <pre><code>import requests
+import os
+from telegram import Update
+from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes
+
+# Replace with your API key and endpoint
+API_KEY = "your_api_key"
+API_URL = "https://llm-data-platform.example.com/api"
+
+# Get your Telegram bot token from environment variable
+TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN")
+
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text('Hello! I am your AI assistant powered by LLM Data Platform. Ask me anything!')
+
+async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text('Just send me a message and I will respond using advanced AI.')
+
+async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    message = update.message.text
+    user_id = update.effective_user.id
+    
+    # Show typing indicator
+    await context.bot.send_chat_action(chat_id=update.effective_chat.id, action="typing")
+    
+    # Call the LLM Data Platform API
+    try:
+        response = requests.post(
+            f"{API_URL}/telegram/chat",
+            json={
+                "message": message,
+                "telegramUserId": str(user_id),
+                "apiKey": API_KEY,
+                "chatContext": {
+                    "chatId": str(update.effective_chat.id),
+                    "username": update.effective_user.username or "",
+                    "firstName": update.effective_user.first_name or "",
+                    "lastName": update.effective_user.last_name or ""
+                }
+            }
+        )
+        
+        if response.status_code == 200:
+            answer = response.json().get("answer", "Sorry, I could not generate a response.")
+        else:
+            answer = f"Sorry, I encountered an error. Please try again later."
+    except Exception as e:
+        answer = f"Sorry, I encountered an error. Please try again later."
+    
+    await update.message.reply_text(answer)
+
+def main():
+    application = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
+    
+    application.add_handler(CommandHandler("start", start))
+    application.add_handler(CommandHandler("help", help_command))
+    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+    
+    application.run_polling()
+
+if __name__ == '__main__':
+    main()</code></pre>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Super simple auth check -->
+    <script src="js/auth-super-simple.js"></script>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <!-- Authentication Check -->
+    <script src="js/auth-check.js"></script>
+    
+    <!-- Initialize Firebase -->
+    <script>
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+    
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    </script>
+    
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Platform Common JS -->
+    <script src="js/platform-common.js"></script>
+    
+    <!-- Custom JS -->
+    <script>
+    // Setup copy buttons
+    document.querySelectorAll('.copy-btn').forEach(button => {
+      button.addEventListener('click', () => {
+        const codeBlock = button.closest('.code-block');
+        const codeElement = codeBlock.querySelector('pre code');
+        
+        // Create a temporary textarea element to copy the text
+        const textarea = document.createElement('textarea');
+        textarea.value = codeElement.textContent;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        
+        // Change button text temporarily
+        const originalText = button.textContent;
+        button.textContent = 'Copied!';
+        setTimeout(() => {
+          button.textContent = originalText;
+        }, 2000);
+      });
+    });
+    </script>
+</body>
+</html>

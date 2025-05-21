@@ -17,6 +17,110 @@
     <!-- Main CSS Files -->
     <link rel="stylesheet" href="css/style.css">
 
+    <!-- Additional Custom Styles -->
+    <style>
+        .nav-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            position: relative;
+        }
+        
+        /* Logo and auth container */
+        .logo-auth-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            position: relative;
+            padding: 0 15px;
+            box-sizing: border-box;
+        }
+        
+
+        #auth-buttons {
+            position: relative;
+            z-index: 100;
+        }
+        
+        /* Client overlay positioning */
+        .client-overlay {
+            display: flex;
+            justify-content: flex-end; /* Position items at the end (right side) */
+            align-items: flex-start; /* Align to top */
+            padding: 10px;
+            position: relative;
+        }
+        
+        .client-overlay span {
+            color: #fff;
+            background-color: var(--accent-color, #8e0ff1); /* Use accent color matching the buttons */
+            border-radius: 2px;
+            padding: 5px 15px;
+            font-size: small;
+            font-weight: 500;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            text-transform: uppercase;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: all 0.2s ease;
+        }
+        
+        .client-overlay span:hover {
+            background-color: var(--accent-hover-color, #7700cc);
+            transform: translateY(-2px);
+        }
+        @media (max-width: 768px) {
+            .logo-auth-container {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                background-color: #fff;
+                z-index: 1000;
+                padding: 10px 15px;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            /* Force SWIPIES logo to left side */
+            #logo {
+                float: left;
+                text-align: left;
+                margin-right: auto;
+            }
+            #logo {
+                flex: 0 0 auto;
+                margin-right: 0;
+            }
+            #auth-buttons {
+                position: absolute;
+                top: 20px;
+                right: 60px;
+                display: block !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+                z-index: 1001;
+            }
+            #auth-buttons .button {
+                padding: 3px 8px;
+                font-size: 12px !important;
+                margin-top: 0 !important;
+            }
+            #banner-logo {
+                max-height: 30px;
+            }
+            #nav-trigger {
+                margin-left: auto;
+                position: relative;
+                z-index: 200;
+            }
+        }
+    </style>
+
     <!-- Namari Color CSS -->
     <link rel="stylesheet" href="css/namari-color.css">
 
@@ -28,6 +132,123 @@
 
     <!--Google Webfonts-->
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700,800' rel='stylesheet' type='text/css'>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+
+    <!-- Initialize Firebase with our config -->
+    <script>
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyAOKeEnQuV_bkKXq7lE08tEZ-S7CuAHXlw",
+      authDomain: "swipies-ai.firebaseapp.com",
+      projectId: "swipies-ai",
+      storageBucket: "swipies-ai.firebasestorage.app",
+      messagingSenderId: "705282430100",
+      appId: "1:705282430100:web:bc179e131a6dea6b6f5081",
+      measurementId: "G-E7MF4TNZ5T"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    </script>
+    
+    <!-- User Authentication Script -->
+    <script>
+    // Check authentication state when document is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        checkAuthState();
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('profile-dropdown');
+            if (dropdown && dropdown.style.display === 'block') {
+                if (!event.target.closest('#user-profile')) {
+                    dropdown.style.display = 'none';
+                }
+            }
+        });
+    });
+    
+    // Check if user is authenticated
+    function checkAuthState() {
+        // First check localStorage for quick UI update
+        const userLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
+        const userData = localStorage.getItem('userData');
+        
+        if (userLoggedIn && userData) {
+            showUserProfile(JSON.parse(userData));
+        } else {
+            showAuthButtons();
+        }
+        
+        // Then verify with Firebase for accuracy
+        firebase.auth().onAuthStateChanged(function(user) {
+            if (user) {
+                // User is signed in
+                const userData = {
+                    uid: user.uid,
+                    displayName: user.displayName || user.email.split('@')[0],
+                    email: user.email,
+                    photoURL: user.photoURL || 'images/default-avatar.png'
+                };
+                
+                // Save to localStorage for future quick checks
+                localStorage.setItem('userLoggedIn', 'true');
+                localStorage.setItem('userData', JSON.stringify(userData));
+                
+                showUserProfile(userData);
+            } else {
+                // User is signed out
+                showAuthButtons();
+            }
+        });
+    }
+    
+    // Show user profile in navigation
+    function showUserProfile(userData) {
+        document.getElementById('auth-buttons').style.display = 'none';
+        document.getElementById('user-profile').style.display = 'block';
+        document.getElementById('user-display-name').textContent = userData.displayName || 'User';
+        
+        if (userData.photoURL) {
+            document.getElementById('user-profile-pic').src = userData.photoURL;
+        }
+    }
+    
+    // Show auth buttons (sign up / login)
+    function showAuthButtons() {
+        document.getElementById('auth-buttons').style.display = 'block';
+        document.getElementById('user-profile').style.display = 'none';
+    }
+    
+    // Toggle profile dropdown menu
+    function toggleProfileMenu(event) {
+        event.preventDefault();
+        const dropdown = document.getElementById('profile-dropdown');
+        dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+    }
+    
+    // Sign out function
+    function signOut(event) {
+        event.preventDefault();
+        
+        // Clear local storage
+        localStorage.removeItem('userLoggedIn');
+        localStorage.removeItem('userData');
+        
+        // Sign out from Firebase
+        firebase.auth().signOut().then(function() {
+            // Sign-out successful
+            showAuthButtons();
+            window.location.href = '/'; // Redirect to home page
+        }).catch(function(error) {
+            // An error happened
+            console.error('Sign out error:', error);
+        });
+    }
+    </script>
 </head>
 
 
@@ -61,7 +282,6 @@
                     
                     <!--Logo-->
                     <div id="logo">
-
                         <!--Logo that is shown on the banner-->
                         <img src="images/logo.png" id="banner-logo" alt="Landing Page"/>
                         <!--End of Banner Logo-->
@@ -69,23 +289,43 @@
                         <!--The Logo that is shown on the sticky Navigation Bar-->
                         <img src="images/logo-2.png" id="navigation-logo" alt="Landing Page"/>
                         <!--End of Navigation Logo-->
-
                     </div>
                     <!--End of Logo-->
 
-                    
-                    <aside>
-
-                        <!-- Auth Buttons -->
-                     <!-- Auth Buttons -->
-                        <div id="auth-buttons" class="auth-buttons" style="margin-bottom: 20px;">
-                            <a href="signup.html" class="button" style="font-size: small;">Sign Up</a>
-                            <a href="login.html" class="button" style="font-size: small;">Login</a>
+                    <!-- Auth Section - Fixed Position outside any containers -->
+                    <div id="auth-section" style="position: absolute; top: 20px; right: 100px; z-index: 9999;">
+                        <!-- Auth buttons will be shown when user is not logged in -->
+                        <div id="auth-buttons" style="display: none;">
+                            <a href="../llm-data-platform/public/signup.html" class="button" style="font-size: small; margin-right: 5px; display: inline-block;">Sign Up</a>
+                            <a href="../llm-data-platform/public/login.html" class="button" style="font-size: small; display: inline-block;">Login</a>
                         </div>
+                        
+                        <!-- User profile will be shown when user is logged in -->
+                        <div id="user-profile" style="display: none;">
+                            <div class="dropdown" style="display: inline-block;">
+                                <a href="#" class="dropdown-toggle" style="color: white; text-decoration: none; display: flex; align-items: center;" onclick="toggleProfileMenu(event)">
+                                    <img id="user-profile-pic" src="images/default-avatar.png" alt="Profile" style="width: 32px; height: 32px; border-radius: 50%; margin-right: 8px; object-fit: cover;">
+                                    <span id="user-display-name" style="margin-right: 4px;">User</span>
+                                    <i class="fa fa-caret-down"></i>
+                                </a>
+                                <div id="profile-dropdown" class="dropdown-menu" style="display: none; position: absolute; right: 0; background: white; border-radius: 4px; box-shadow: 0 2px 10px rgba(0,0,0,0.2); min-width: 150px; z-index: 10000;">
+                                    <a href="../llm-data-platform/public/account.html" style="display: block; padding: 10px 15px; color: #333; text-decoration: none; font-size: 14px;">
+                                        <i class="fa fa-user"></i> My Account
+                                    </a>
+                                    <a href="../llm-data-platform/public/main.html" style="display: block; padding: 10px 15px; color: #333; text-decoration: none; font-size: 14px;">
+                                        <i class="fa fa-robot"></i> My Bots
+                                    </a>
+                                    <div style="border-top: 1px solid #eee; margin: 5px 0;"></div>
+                                    <a href="#" onclick="signOut(event)" style="display: block; padding: 10px 15px; color: #d9534f; text-decoration: none; font-size: 14px;">
+                                        <i class="fa fa-sign-out"></i> Logout
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-
-                        </aside>
-    
+                    
+                    <div class="header-elements clearfix">
                     
 
                     <!--Main Navigation-->
@@ -123,6 +363,7 @@
                     <nav id="nav-mobile"></nav>
 
                 </div>
+                </div><!-- End of header-elements -->
             </div>
         </div><!--End of Header-->
 
@@ -314,86 +555,104 @@ using the Refine Tuning methodology.</h2>
         </section>
         <!--End of Clients-->
 
+        
         <!--Pricing Tables-->
-        <section id="pricing" class="secondary-color text-center scrollto clearfix ">
-            <div class="row clearfix">
+<section id="pricing" class="secondary-color text-center scrollto clearfix ">
+    <div class="row clearfix">
 
-                <div class="section-heading">
-                    <h3>Our products</h3>
-                    <h2 class="section-title">We have the right AI for your company</h2>
+        <div class="section-heading">
+            <h3>YOUR CHOICE</h3>
+            <h2 class="section-title">We have the right package for you</h2>
+        </div>
+
+        <!--Pricing Block-->
+        <div class="pricing-block col-3 wow fadeInUp" data-wow-delay="0.4s">
+            <div class="pricing-block-content">
+                <h3>Standard</h3>
+                <p class="pricing-sub">Connect 1 chatbot</p>
+                <div class="pricing">
+                    <div class="price"><span>$</span>0</div>
+                    <p>$1 per 180 tokens</p>
                 </div>
-
-                <!--Pricing Block-->
-                <div class="pricing-block col-3 wow fadeInUp" data-wow-delay="0.4s">
-                    <div class="pricing-block-content">
-                        <h3>Refine tunning</h3>
-                        <p class="pricing-sub">llama models</p>
-                        <div class="pricing">
-                            <div class="price"><span></span>🧠 LLaMA AI</div>
-                            <p>LLaMA models process text using deep learning, understand context, and generate accurate, human-like responses, making them ideal for AI-driven communication.</p>
-                        </div>
-                        <ul>
-
-                            <li>6 month support</li>
-                            <li>Web </li>
-                            <li>Telegram bot</li>
-                            <li>Personal Support</li>
-                           
-                        </ul>
-                        <a href="#" class="button">Conntact TODAY</a>
-                    </div>
-                </div>
-                <!--End Pricing Block-->
-
-                <!--Pricing Block-->
-                <div class="pricing-block featured col-3 wow fadeInUp" data-wow-delay="0.6s">
-                    <div class="pricing-block-content">
-                        <h3> Speech AI </h3>
-                        <p class="pricing-sub">Most popular choice</p>
-                        <div class="pricing">
-                            <div class="price"><span></span>🗣️ Speech ai</div>
-                            <p>Speech AI converts voice into text, processes it with LLaMA, and generates intelligent responses. The output can then be transformed back into speech for a seamless interaction.</p>
-                        </div>
-                        <ul>
-                            
-                            <li>12 month support</li>
-                            <li>Web </li>
-                            <li>Calling</li>
-                            <li>Personal Support</li>
-                        </ul>
-                        <a href="#" class="button">Conntact TODAY</a>
-                    </div>
-                </div>
-                <!--End Pricing Block-->
-
-                <!--Pricing Block-->
-                <div class="pricing-block col-3 wow fadeInUp" data-wow-delay="0.8s">
-                    <div class="pricing-block-content">
-                        <h3>Whisper AI</h3>
-                        <p class="pricing-sub">For App</p>
-                        <div class="pricing">
-                            <div class="price"><span></span>👂🏼 Listener</div>
-                            <p>Whisper AI is an advanced speech recognition model that converts spoken language into accurate text, enabling seamless voice interactions.</p>
-                        </div>
-                        <ul>
-                            
-                            <li>3 month support</li>
-                            <li>Web </li>
-                            <li>App integration</li>
-                            <li>Personal Support</li>
-
-                        </ul>
-                        <a href="#" class="button">Conntact TODAY</a>
-                    </div>
-                </div>
-                <!--End Pricing Block-->
-
+                <ul>
+                    <li>1 chatbot</li>
+                    <li>No monthly fee</li>
+                    <li>Pay-as-you-go</li>
+                    <li>Basic customization</li>
+                    <li>Email support</li>
+                </ul>
+                <a href="#" class="button">BUY TODAY</a>
             </div>
-        </section>
-        <!--End of Pricing Tables-->
+        </div>
+        <!--End Pricing Block-->
+
+        <!--Pricing Block-->
+        <div class="pricing-block featured col-3 wow fadeInUp" data-wow-delay="0.6s">
+            <div class="pricing-block-content">
+                <h3>Plus</h3>
+                <p class="pricing-sub">Most popular choice</p>
+                <div class="pricing">
+                    <div class="price"><span>$</span>20</div>
+                    <p>$1 per 180 tokens</p>
+                </div>
+                <ul>
+                    <li>Up to 5 chatbots</li>
+                    <li>Monthly subscription</li>
+                    <li>Bot customization</li>
+                    <li>Embed on websites</li>
+                    <li>Priority support</li>
+                </ul>
+                <a href="#" class="button">BUY TODAY</a>
+            </div>
+        </div>
+        <!--End Pricing Block-->
+
+        <!--Pricing Block-->
+        <div class="pricing-block col-3 wow fadeInUp" data-wow-delay="0.8s">
+            <div class="pricing-block-content">
+                <h3>Pro</h3>
+                <p class="pricing-sub">For professionals & teams</p>
+                <div class="pricing">
+                    <div class="price"><span>$</span>45</div>
+                    <p>$1 per 150 tokens</p>
+                </div>
+                <ul>
+                    <li>Up to 10 chatbots</li>
+                    <li>Pro Console access</li>
+                    <li>Advanced customization</li>
+                    <li>Analytics dashboard</li>
+                    <li>Premium support</li>
+                </ul>
+                <a href="#" class="button">BUY TODAY</a>
+            </div>
+        </div>
+        <!--End Pricing Block-->
+
+    </div>
+</section>
+<!--End of Pricing Tables-->
 
     </main>
     <!--End Main Content Area-->
+    
+    <!-- Authentication and redirection script -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add click event to the START Now button
+        document.getElementById('start-btn').addEventListener('click', function() {
+            // Check if user is signed in
+            firebase.auth().onAuthStateChanged(function(user) {
+                if (user) {
+                    // User is signed in, redirect to main.html in llm-data-platform
+                    window.location.href = '../llm-data-platform/public/main.html';
+                } else {
+                    // No user is signed in, redirect to login page in LLM Data Platform
+                    window.location.href = '../llm-data-platform/public/login.html';
+                }
+            });
+        });
+    });
+    </script>
 
 
     <!--Footer-->

@@ -10,19 +10,20 @@ document.addEventListener("DOMContentLoaded", () => {
       auth.signInWithEmailAndPassword(email, password)
         .then(userCredential => {
           alert("Login successful!");
-          window.location.href = "main.html";
+          window.location.href = "../llm-data-platform/public/main.html";
         })
         .catch(error => {
           alert("Login failed: " + error.message);
         });
     });
   
-    window.signInWithGoogle = function () {
+    // Fixed function name to match what's called in the HTML
+    window.loginWithGoogle = function () {
       const provider = new firebase.auth.GoogleAuthProvider();
       auth.signInWithPopup(provider)
         .then(result => {
           alert("Logged in with Google!");
-           window.location.href = "main.html";
+          window.location.href = "../llm-data-platform/public/main.html";
         })
         .catch(error => {
           alert("Google login error: " + error.message);

@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sign Up | LLM Data Platform</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #f8f9fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        .signup-container {
+            width: 100%;
+            max-width: 420px;
+            padding: 32px;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        }
+        
+        .signup-logo {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        
+        .signup-logo img {
+            height: 60px;
+        }
+        
+        h2 {
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 24px;
+            color: #212529;
+        }
+        
+        form {
+            margin-bottom: 20px;
+        }
+        
+        .form-control {
+            font-size: 16px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+        
+        .btn {
+            padding: 12px 16px;
+            font-weight: 500;
+            border-radius: 8px;
+        }
+        
+        .google-btn {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            padding: 12px 16px;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            color: #555;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .google-btn:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .link {
+            text-align: center;
+            margin-top: 20px;
+            color: #6c757d;
+        }
+        
+        .link a {
+            color: #0d6efd;
+            text-decoration: none;
+        }
+        
+        .link a:hover {
+            text-decoration: underline;
+        }
+        
+        .alert {
+            margin-bottom: 16px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="signup-container">
+    <div class="signup-logo">
+        <h1>LLM Data Platform</h1>
+    </div>
+    
+    <h2>Create Account</h2>
+    
+    <div id="alertMessage" class="alert"></div>
+    
+    <form id="signupForm">
+        <div class="mb-3">
+            <input type="text" class="form-control" id="nameInput" placeholder="Full name" required>
+        </div>
+        <div class="mb-3">
+            <input type="email" class="form-control" id="emailInput" placeholder="Email address" required>
+        </div>
+        <div class="mb-3">
+            <input type="password" class="form-control" id="passwordInput" placeholder="Password (min. 6 characters)" required>
+        </div>
+        <div class="mb-3">
+            <input type="password" class="form-control" id="confirmPasswordInput" placeholder="Confirm password" required>
+        </div>
+        <button type="submit" class="btn btn-primary w-100 mb-3">Create Account</button>
+    </form>
+
+    <button class="google-btn" onclick="signupWithGoogle()">
+        <i class="bi bi-google"></i> Sign up with Google
+    </button>
+
+    <div class="link">
+        Already have an account? <a href="login.html">Sign in</a>
+    </div>
+</div>
+
+<!-- No auth check needed on signup page -->
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+<!-- Direct initialization script -->
+<script>
+// Flag to indicate we're on signup page
+
+// Direct initialization with Firebase config
+const firebaseConfig = {
+    apiKey: "AIzaSyAOKeEnQuV_bkKXq7lE08tEZ-S7CuAHXlw",
+    authDomain: "swipies-ai.firebaseapp.com",
+    projectId: "swipies-ai",
+    storageBucket: "swipies-ai.firebasestorage.app",
+    messagingSenderId: "705282430100",
+    appId: "1:705282430100:web:bc179e131a6dea6b6f5081",
+    measurementId: "G-E7MF4TNZ5T"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+
+// Set persistence to local (browser persistence)
+firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+
+// Handle signup page functionality
+document.addEventListener('DOMContentLoaded', function() {
+    // One-time check for login status (no loops)
+    if (firebase.auth().currentUser) {
+        console.log("User already logged in, redirecting to main page");
+        handleSuccessfulSignup();
+        return;
+    }
+    
+    // Check once for existing login and immediately unsubscribe
+    const unsubscribe = firebase.auth().onAuthStateChanged(function(user) {
+        // Unsubscribe immediately
+        unsubscribe();
+        
+        if (user) {
+            console.log("User already logged in, redirecting to main page");
+            handleSuccessfulSignup();
+        } else {
+            // Initialize form handlers
+            initializeAuthentication();
+        }
+    });
+});
+
+function initializeAuthentication() {
+    // Email/Password Signup
+    document.getElementById('signupForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const name = document.getElementById('nameInput').value;
+        const email = document.getElementById('emailInput').value;
+        const password = document.getElementById('passwordInput').value;
+        const confirmPassword = document.getElementById('confirmPasswordInput').value;
+        
+        // Form validation
+        if (password !== confirmPassword) {
+            showAlert('Passwords do not match', 'danger');
+            return;
+        }
+        
+        if (password.length < 6) {
+            showAlert('Password must be at least 6 characters', 'danger');
+            return;
+        }
+        
+        // Show registration in progress
+        document.getElementById('signupForm').innerHTML = '<div class="text-center"><div class="spinner-border text-primary" role="status"></div><p class="mt-2">Creating your account...</p></div>';
+        
+        // Create user account
+        firebase.auth().createUserWithEmailAndPassword(email, password)
+            .then(function(userCredential) {
+                // Update display name
+                return userCredential.user.updateProfile({
+                    displayName: name
+                }).then(function() {
+                    // Create user profile in Firestore
+                    return createUserProfile(userCredential.user.uid, {
+                        name: name,
+                        email: email,
+                        createdAt: new Date().toISOString()
+                    });
+                });
+            })
+            .then(function() {
+                console.log("Account created successfully!");
+                handleSuccessfulSignup();
+            })
+            .catch(function(error) {
+                console.error("Signup error:", error);
+                showAlert('Error: ' + error.message, 'danger');
+                // Restore signup form without page reload
+                resetSignupForm();
+            });
+    });
+}
+
+// Reset signup form without refreshing
+function resetSignupForm() {
+    const formContainer = document.getElementById('signupForm');
+    formContainer.innerHTML = `
+        <div class="mb-3">
+            <input type="text" class="form-control" id="nameInput" placeholder="Full name" required>
+        </div>
+        <div class="mb-3">
+            <input type="email" class="form-control" id="emailInput" placeholder="Email address" required>
+        </div>
+        <div class="mb-3">
+            <input type="password" class="form-control" id="passwordInput" placeholder="Password (min. 6 characters)" required>
+        </div>
+        <div class="mb-3">
+            <input type="password" class="form-control" id="confirmPasswordInput" placeholder="Confirm password" required>
+        </div>
+        <button type="submit" class="btn btn-primary w-100 mb-3">Create Account</button>
+    `;
+}
+
+// Google Signup
+window.signupWithGoogle = function() {
+    // Show signup in progress
+    document.getElementById('signupForm').innerHTML = '<div class="text-center"><div class="spinner-border text-primary" role="status"></div><p class="mt-2">Signing up with Google...</p></div>';
+    
+    const provider = new firebase.auth.GoogleAuthProvider();
+    
+    firebase.auth().signInWithPopup(provider)
+        .then(function(result) {
+            const user = result.user;
+            const isNewUser = result.additionalUserInfo.isNewUser;
+            
+            if (isNewUser) {
+                // Create user profile for new Google users
+                return createUserProfile(user.uid, {
+                    name: user.displayName || '',
+                    email: user.email || '',
+                    createdAt: new Date().toISOString()
+                }).then(function() {
+                    console.log("Google account created!");
+                    handleSuccessfulSignup();
+                });
+            } else {
+                // Existing user, just redirect
+                console.log("Existing Google user signed in");
+                handleSuccessfulSignup();
+            }
+        })
+        .catch(function(error) {
+            console.error("Google signup error:", error);
+            showAlert('Error: ' + error.message, 'danger');
+            resetSignupForm();
+        });
+};
+
+// Create user profile in Firestore with storage limits
+function createUserProfile(userId, userData) {
+    if (!firebase.firestore) {
+        console.error('Firestore is not available. User profile not created.');
+        return Promise.resolve();
+    }
+    
+    const db = firebase.firestore();
+    return db.collection('users').doc(userId).set({
+        ...userData,
+        // Add user profile metadata
+        displayName: userData.name || '',
+        photoURL: userData.photoURL || '',
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
+        // Initialize storage tracking for 1MB limit
+        storageUsed: 0,
+        storageLimit: 1048576, // 1MB in bytes
+        active: true,
+        // Add rug pull settings
+        rugPullSettings: {
+            defaultLevel: 'subtle',
+            enabled: true
+        }
+    })
+    .then(function() {
+        console.log('User profile created successfully!');
+        // Create initial collections for this user
+        const batch = db.batch();
+        
+        // Create metadata document to track data sources
+        const metadataRef = db.collection('userMetadata').doc(userId);
+        batch.set(metadataRef, {
+            userId: userId,
+            totalSources: 0,
+            totalStorageUsed: 0,
+            maxStorageLimit: 1048576, // 1MB in bytes
+            lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        
+        // Commit the batch
+        return batch.commit();
+    })
+    .catch(function(error) {
+        console.error('Error creating user profile:', error);
+        // Continue without failing the signup process
+        return Promise.resolve();
+    });
+}
+
+// Show alert message with improved styling
+function showAlert(message, type) {
+    const alertElement = document.getElementById('alertMessage');
+    
+    // Add different icons based on alert type
+    let icon = '';
+    switch(type) {
+        case 'success':
+            icon = '<i class="bi bi-check-circle-fill me-2"></i>';
+            break;
+        case 'danger':
+            icon = '<i class="bi bi-exclamation-triangle-fill me-2"></i>';
+            break;
+        case 'warning':
+            icon = '<i class="bi bi-exclamation-circle-fill me-2"></i>';
+            break;
+        case 'info':
+            icon = '<i class="bi bi-info-circle-fill me-2"></i>';
+            break;
+    }
+    
+    alertElement.className = 'alert alert-' + type + ' d-flex align-items-center';
+    alertElement.innerHTML = icon + message;
+    alertElement.style.display = 'block';
+    
+    // Animate in
+    alertElement.style.opacity = '0';
+    alertElement.style.transform = 'translateY(-10px)';
+    alertElement.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+    
+    setTimeout(() => {
+        alertElement.style.opacity = '1';
+        alertElement.style.transform = 'translateY(0)';
+    }, 10);
+    
+    // Auto-hide success alerts after 3 seconds
+    if (type === 'success') {
+        setTimeout(function() {
+            alertElement.style.opacity = '0';
+            alertElement.style.transform = 'translateY(-10px)';
+            setTimeout(() => {
+                alertElement.style.display = 'none';
+            }, 300);
+        }, 3000);
+    }
+}
+
+// Handle successful signup with redirect
+function handleSuccessfulSignup() {
+  // Show success message before redirecting
+  showAlert('Account created successfully! Redirecting...', 'success');
+  
+  // Clear any auth check skipFlags
+  sessionStorage.removeItem('skipAuthCheck');
+  
+  // Get the return URL
+  const returnUrl = sessionStorage.getItem('returnTo');
+  sessionStorage.removeItem('returnTo');
+  
+  // Redirect to the return URL or main page
+  window.location.href = returnUrl || 'main.html';
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Bots - LLM Data Platform</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Google Fonts - Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Platform Styles -->
+    <link rel="stylesheet" href="css/platform-styles.css">
+    
+    <!-- Page Specific CSS -->
+    <style>
+        .bot-card {
+            transition: all 0.2s ease;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .bot-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .bot-card .card-img-top {
+            height: 160px;
+            object-fit: cover;
+            background-color: var(--primary-light);
+        }
+        
+        .bot-card .card-body {
+            flex: 1;
+        }
+        
+        .bot-stats {
+            background-color: var(--light-gray);
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .bot-stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .bot-stat-value {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--primary-color);
+        }
+        
+        .bot-stat-label {
+            font-size: 0.75rem;
+            color: var(--secondary-color);
+        }
+        
+        .bot-action-btn {
+            padding: 6px 12px;
+            font-size: 0.85rem;
+        }
+        
+        .no-bots-container {
+            background-color: var(--light-bg);
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .no-bots-icon {
+            font-size: 4rem;
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+        
+        .bot-card .badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            font-size: 0.7rem;
+            padding: 5px 10px;
+            border-radius: 20px;
+        }
+        
+        .bot-details-modal .modal-header {
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .bot-details-modal .modal-footer {
+            border-top: 1px solid var(--border-color);
+        }
+        
+        /* Custom badge colors */
+        .badge-active {
+            background-color: var(--success-color);
+            color: white;
+        }
+        
+        .badge-inactive {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        /* Bot card actions hover effects */
+        .bot-card-actions {
+            visibility: hidden;
+            opacity: 0;
+            transition: all 0.2s ease;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+        
+        .bot-card:hover .bot-card-actions {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        @media (max-width: 767.98px) {
+            .bot-card-actions {
+                visibility: visible;
+                opacity: 1;
+                position: static;
+                margin-top: 10px;
+                display: flex;
+                justify-content: flex-end;
+            }
+            
+            .bot-stat-value {
+                font-size: 0.9rem;
+            }
+            
+            .bot-stat-label {
+                font-size: 0.7rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Mobile Header (visible only on small screens) -->
+    <div class="mobile-header d-md-none">
+        <button class="sidebar-toggle">
+            <i class="bi bi-list"></i>
+        </button>
+        <h5>LLM Data Platform</h5>
+    </div>
+
+    <div class="container-fluid p-0">
+        <div class="row g-0">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <div class="sidebar-header">
+                    <h5>LLM Data Platform</h5>
+                    <button class="sidebar-toggle d-none d-md-block d-lg-none">
+                        <i class="bi bi-arrow-left"></i>
+                    </button>
+                </div>
+                
+                <a href="main.html" class="sidebar-item">
+                    <i class="bi bi-plus-circle"></i> <span>Create Agent</span>
+                </a>
+                <a href="bots.html" class="sidebar-item active">
+                    <i class="bi bi-robot"></i> <span>My Bots</span>
+                </a>
+                
+                <a href="account.html" class="sidebar-item">
+                    <i class="bi bi-person-circle"></i> <span>My Account</span>
+                </a>
+                <a href="files.html" class="sidebar-item">
+                    <i class="bi bi-file-earmark"></i> <span>Files</span>
+                </a>
+                <a href="text.html" class="sidebar-item">
+                    <i class="bi bi-text-paragraph"></i> <span>Text</span>
+                </a>
+                <a href="website.html" class="sidebar-item">
+                    <i class="bi bi-globe"></i> <span>Website</span>
+                </a>
+                <a href="qa.html" class="sidebar-item">
+                    <i class="bi bi-chat-dots"></i> <span>Q&A</span>
+                </a>
+                <!-- Telegram functionality integrated into Bots page -->
+                <a href="documentation.html" class="sidebar-item">
+                    <i class="bi bi-book"></i> <span>Documentation</span>
+                </a>
+            </div>
+            
+            <!-- Main Content Area -->
+            <div class="main-content">
+                <!-- Pro/Standard Version Buttons -->
+                <div class="d-flex justify-content-center mb-4">
+                    <a href="#" class="btn btn-light me-3 px-5">Standard</a>
+                    <a href="#" class="btn btn-dark px-5">Pro</a>
+                </div>
+                
+                <!-- Bots Section Header -->
+                <div class="header d-flex justify-content-between align-items-center">
+                    <h1>My Bots</h1>
+                    <div>
+                        <a href="main.html" class="btn btn-primary">
+                            <i class="bi bi-plus-lg"></i> Create New Bot
+                        </a>
+                        <button id="refreshBots" class="btn btn-outline-secondary ms-2">
+                            <i class="bi bi-arrow-repeat"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Filters and Search -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                                    <input type="text" class="form-control" id="botSearch" placeholder="Search bots...">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-select" id="botStatusFilter">
+                                    <option value="all">All Status</option>
+                                    <option value="active">Active</option>
+                                    <option value="inactive">Inactive</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-select" id="botSortFilter">
+                                    <option value="newest">Newest First</option>
+                                    <option value="oldest">Oldest First</option>
+                                    <option value="nameAsc">Name (A-Z)</option>
+                                    <option value="nameDesc">Name (Z-A)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Bots List Section -->
+                <div class="row g-4" id="botsList">
+                    <!-- Bot cards will be inserted here via JavaScript -->
+                    
+                    <!-- Loading Spinner (shown while loading) -->
+                    <div class="col-12 text-center py-5" id="botsLoading">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2 text-muted">Loading your bots...</p>
+                    </div>
+                    
+                    <!-- No Bots Message (shown when no bots exist) -->
+                    <div class="col-12 d-none" id="noBotsMessage">
+                        <div class="no-bots-container">
+                            <i class="bi bi-robot no-bots-icon"></i>
+                            <h3>You Haven't Created Any Bots Yet</h3>
+                            <p class="text-muted">Bots let you create AI assistants with rug pull capabilities that can manipulate context to guide users in specific directions.</p>
+                            <p>Create your first bot to:</p>
+                            <ul class="text-start text-muted mb-4">
+                                <li><i class="bi bi-check-circle-fill text-success me-2"></i> Deploy AI assistants on your website</li>
+                                <li><i class="bi bi-check-circle-fill text-success me-2"></i> Guide customer conversations toward desired outcomes</li>
+                                <li><i class="bi bi-check-circle-fill text-success me-2"></i> Leverage your existing data sources for precise manipulations</li>
+                            </ul>
+                            <a href="main.html" class="btn btn-primary mt-3">
+                                <i class="bi bi-plus-lg"></i> Create Your First Bot
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bot Details Modal -->
+    <div class="modal fade bot-details-modal" id="botDetailsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Bot Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <!-- Bot Info -->
+                        <div class="col-md-4 text-center mb-4 mb-md-0">
+                            <img id="modalBotLogo" src="assets/bot-placeholder.png" alt="Bot Logo" class="img-fluid rounded mb-3" style="max-height: 150px;">
+                            <h4 id="modalBotName">Bot Name</h4>
+                            <span id="modalBotStatus" class="badge badge-active">Active</span>
+                        </div>
+                        
+                        <!-- Bot Details -->
+                        <div class="col-md-8">
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Description</label>
+                                <p id="modalBotDescription" class="border p-2 rounded">Bot description goes here...</p>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="mb-3">
+                                        <label class="form-label text-muted">Created On</label>
+                                        <p id="modalBotCreated" class="border p-2 rounded">YYYY-MM-DD</p>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="mb-3">
+                                        <label class="form-label text-muted">Last Modified</label>
+                                        <p id="modalBotModified" class="border p-2 rounded">YYYY-MM-DD</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Integration Code</label>
+                                <pre id="modalBotIntegrationCode" class="bg-light p-3 rounded position-relative" style="max-height: 120px; overflow-y: auto;"><code></code><button class="copy-btn" onclick="copyToClipboard('modalBotIntegrationCode')">Copy</button></pre>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Bot Statistics -->
+                    <div class="mt-4">
+                        <h5>Bot Statistics</h5>
+                        <div class="row g-3 mt-2">
+                            <div class="col-md-3 col-6">
+                                <div class="card">
+                                    <div class="card-body text-center">
+                                        <h2 id="modalBotInteractions" class="mb-1">0</h2>
+                                        <p class="text-muted small mb-0">Total Interactions</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <div class="card">
+                                    <div class="card-body text-center">
+                                        <h2 id="modalBotUsers" class="mb-1">0</h2>
+                                        <p class="text-muted small mb-0">Unique Users</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <div class="card">
+                                    <div class="card-body text-center">
+                                        <h2 id="modalBotAvgTime" class="mb-1">0s</h2>
+                                        <p class="text-muted small mb-0">Avg. Response Time</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <div class="card">
+                                    <div class="card-body text-center">
+                                        <h2 id="modalBotManipulations" class="mb-1">0</h2>
+                                        <p class="text-muted small mb-0">Manipulations</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-danger" onclick="deleteBot(currentBotId)">Delete Bot</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="window.location.href='main.html?edit=' + currentBotId">Edit Bot</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteBotModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirm Delete</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete the bot "<span id="deleteBotName"></span>"?</p>
+                    <p class="text-danger">This action cannot be undone.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete Bot</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Super simple auth check -->
+    <script src="js/auth-super-simple.js"></script>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <!-- Authentication Check -->
+    <script src="js/auth-check.js"></script>
+    
+    <!-- Initialize Firebase -->
+    <script>
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+    
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    </script>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Platform Common JS -->
+    <script src="js/platform-common.js"></script>
+    <!-- Custom JS for Bots Page -->
+    <script src="js/bots.js"></script>
+    <!-- Telegram Bot Integration JS -->
+    <script src="js/telegram-integration.js"></script>
+    
+    <!-- Telegram Bot Integration Modal -->
+    <div class="modal fade" id="telegramIntegrationModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-telegram me-2"></i>Telegram Bot Integration</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row" id="telegramIntegrationTabs">
+                        <div class="col-md-3">
+                            <div class="list-group" id="bot-integration-list" role="tablist">
+                                <a class="list-group-item list-group-item-action active" id="api-keys-tab" data-bs-toggle="list" href="#api-keys" role="tab" aria-controls="api-keys">API Keys</a>
+                                <a class="list-group-item list-group-item-action" id="connected-bots-tab" data-bs-toggle="list" href="#connected-bots" role="tab" aria-controls="connected-bots">Connected Bots</a>
+                                <a class="list-group-item list-group-item-action" id="setup-guide-tab" data-bs-toggle="list" href="#setup-guide" role="tab" aria-controls="setup-guide">Setup Guide</a>
+                            </div>
+                        </div>
+                        <div class="col-md-9">
+                            <div class="tab-content" id="nav-tabContent">
+                                <!-- API Keys Tab -->
+                                <div class="tab-pane fade show active" id="api-keys" role="tabpanel" aria-labelledby="api-keys-tab">
+                                    <h5 class="mb-3">Generate API Key</h5>
+                                    <p>Generate an API key to connect your bot to Telegram. Your bot will use all its configured data sources with rug pull capabilities.</p>
+                                    
+                                    <div class="mb-3">
+                                        <label for="botSelectorTelegram" class="form-label">Select a Bot to Connect</label>
+                                        <select class="form-select" id="botSelectorTelegram">
+                                            <option value="">-- Select a Bot --</option>
+                                            <!-- Options will be populated via JavaScript -->
+                                        </select>
+                                    </div>
+                                    
+                                    <button id="generateApiKeyBtn" class="btn btn-primary" disabled>Generate API Key</button>
+                                    
+                                    <hr class="my-4">
+                                    
+                                    <h5 class="mb-3">Your API Keys</h5>
+                                    <div id="apiKeysList" class="mt-3">
+                                        <div class="text-center text-muted py-5">
+                                            <i class="bi bi-key fs-1 mb-3 d-block"></i>
+                                            <p>No API keys generated yet.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Connected Bots Tab -->
+                                <div class="tab-pane fade" id="connected-bots" role="tabpanel" aria-labelledby="connected-bots-tab">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <h5 class="mb-0">Connected Telegram Bots</h5>
+                                        <button class="btn btn-sm btn-outline-primary" id="refreshConnectionsBtn">
+                                            <i class="bi bi-arrow-repeat"></i> Refresh
+                                        </button>
+                                    </div>
+                                    
+                                    <div id="connectedBotsList" class="mt-3">
+                                        <div class="text-center text-muted py-5">
+                                            <i class="bi bi-telegram fs-1 mb-3 d-block"></i>
+                                            <p>No connected Telegram bots found.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Setup Guide Tab -->
+                                <div class="tab-pane fade" id="setup-guide" role="tabpanel" aria-labelledby="setup-guide-tab">
+                                    <h5 class="mb-3">How to Connect Your Bot to Telegram</h5>
+                                    
+                                    <div class="accordion" id="setupAccordion">
+                                        <div class="accordion-item">
+                                            <h2 class="accordion-header" id="headingOne">
+                                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                                    Step 1: Create a Telegram Bot
+                                                </button>
+                                            </h2>
+                                            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#setupAccordion">
+                                                <div class="accordion-body">
+                                                    <ol class="list-group list-group-numbered mb-3">
+                                                        <li class="list-group-item">Open Telegram and search for <strong>@BotFather</strong></li>
+                                                        <li class="list-group-item">Start a chat and send <code>/newbot</code> command</li>
+                                                        <li class="list-group-item">Follow the instructions to name your bot</li>
+                                                        <li class="list-group-item">BotFather will give you a token (keep it secure!)</li>
+                                                    </ol>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="accordion-item">
+                                            <h2 class="accordion-header" id="headingTwo">
+                                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                                    Step 2: Connect to LLM Data Platform
+                                                </button>
+                                            </h2>
+                                            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#setupAccordion">
+                                                <div class="accordion-body">
+                                                    <ol class="list-group list-group-numbered mb-3">
+                                                        <li class="list-group-item">Generate an API key for your bot in the API Keys tab</li>
+                                                        <li class="list-group-item">Access our webhook URL: <code>https://api.llmdataplatform.com/telegram/webhook</code></li>
+                                                        <li class="list-group-item">Set your bot's webhook using this command (replace with your actual values):
+                                                            <div class="bg-light p-2 mt-2 rounded">
+                                                                <code>https://api.telegram.org/bot&lt;TELEGRAM_TOKEN&gt;/setWebhook?url=https://api.llmdataplatform.com/telegram/webhook?api_key=&lt;YOUR_API_KEY&gt;</code>
+                                                            </div>
+                                                        </li>
+                                                        <li class="list-group-item">Your bot is now connected and will use your custom bot's settings!</li>
+                                                    </ol>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

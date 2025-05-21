@@ -1,0 +1,19 @@
+{
+  "name": "swipies-llm-platform",
+  "version": "1.0.0",
+  "description": "Swipies LLM Data Platform with website",
+  "main": "index.js",
+  "scripts": {
+    "start": "cd app && npm start",
+    "dev": "cd app && npm run dev",
+    "flowise": "cd app && powershell -ExecutionPolicy Bypass -File run-flowise.ps1"
+  },
+  "keywords": [
+    "llm",
+    "data",
+    "platform",
+    "swipies"
+  ],
+  "author": "Swipies Team",
+  "license": "MIT"
+}

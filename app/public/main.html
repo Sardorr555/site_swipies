@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Agent - LLM Data Platform</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Google Fonts - Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Platform Styles -->
+    <link rel="stylesheet" href="css/platform-styles.css">
+    
+    <!-- Page Specific CSS -->
+    <style>
+        :root {
+            /* Professional color scheme */
+            --primary-color: #1a73e8; /* Blue */
+            --primary-dark: #0d47a1;
+            --primary-light: #e8f0fe;
+            --secondary-color: #5f6368; /* Gray */
+            --dark-bg: #202124; /* Black */
+            --dark-surface: #303134;
+            --light-bg: #f8f9fa; /* White */
+            --medium-gray: #dadce0;
+            --light-gray: #f1f3f4;
+            --dark-text: #202124;
+            --light-text: #ffffff;
+            --border-color: #dadce0;
+            --danger-color: #ea4335;
+            --success-color: #34a853;
+            --warning-color: #fbbc04;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--light-bg);
+            color: var(--dark-text);
+            line-height: 1.6;
+        }
+        
+        /* Layout */
+        .container-fluid {
+            padding: 0;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            background-color: var(--dark-bg);
+            height: 100vh;
+            position: fixed;
+            width: 250px;
+            padding: 0;
+            z-index: 1030;
+            transition: all 0.3s ease;
+            overflow-y: auto;
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar-header h5 {
+            color: var(--light-text);
+            font-weight: 600;
+            margin: 0;
+            font-size: 1.1rem;
+        }
+        
+        .sidebar-item {
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+            margin: 2px 0;
+        }
+        
+        .sidebar-item:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: var(--light-text);
+        }
+        
+        .sidebar-item.active {
+            background-color: rgba(26, 115, 232, 0.15);
+            color: var(--primary-color);
+            border-left: 3px solid var(--primary-color);
+        }
+        
+        .sidebar-item i {
+            margin-right: 14px;
+            font-size: 1.2rem;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .sidebar-toggle {
+            background: none;
+            border: none;
+            color: var(--light-text);
+            cursor: pointer;
+            display: none;
+            font-size: 1.5rem;
+            padding: 0;
+        }
+        
+        /* Main Content Area */
+        .main-content {
+            padding: 30px;
+            height: 100vh;
+            overflow-y: auto;
+            margin-left: 250px; /* Match sidebar width */
+            transition: margin-left 0.3s ease;
+            background-color: var(--light-bg);
+        }
+        
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin: 0;
+            color: var(--dark-text);
+        }
+        
+        /* Cards */
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: none;
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+        
+        .card-header {
+            background-color: white;
+            border-bottom: 1px solid var(--border-color);
+            padding: 16px 20px;
+        }
+        
+        .card-header h5 {
+            margin: 0;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .card-body {
+            padding: 20px;
+        }
+        
+        /* Form Controls */
+        .form-label {
+            font-weight: 500;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            color: var(--secondary-color);
+        }
+        
+        .form-control {
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+        }
+        
+        .form-select {
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            height: auto;
+        }
+        
+        /* Buttons */
+        .btn {
+            padding: 10px 20px;
+            font-weight: 500;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            border-color: var(--primary-dark);
+        }
+        
+        .btn-outline-primary {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-outline-primary:hover {
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+        }
+        
+        .btn-dark {
+            background-color: var(--dark-bg);
+            border-color: var(--dark-bg);
+            color: white;
+        }
+        
+        .btn-light {
+            background-color: var(--light-gray);
+            border-color: var(--light-gray);
+            color: var(--dark-text);
+        }
+        
+        /* Source Counters */
+        .source-counter {
+            background-color: white;
+            border-radius: 8px;
+            padding: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+        
+        .source-counter:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .source-counter h5 {
+            font-size: 0.85rem;
+            color: var(--secondary-color);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .source-counter .count {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--dark-text);
+        }
+        
+        /* Chat Interface */
+        .chat-container {
+            height: 300px;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            background-color: white;
+        }
+        
+        .user-message {
+            background-color: var(--primary-light);
+            padding: 12px 16px;
+            border-radius: 18px 18px 4px 18px;
+            margin-bottom: 12px;
+            max-width: 80%;
+            align-self: flex-end;
+            margin-left: auto;
+            color: var(--dark-text);
+        }
+        
+        .bot-message {
+            background-color: var(--light-gray);
+            padding: 12px 16px;
+            border-radius: 18px 18px 18px 4px;
+            margin-bottom: 12px;
+            max-width: 80%;
+            color: var(--dark-text);
+        }
+        
+        /* Code Block */
+        .code-block {
+            background-color: var(--dark-surface);
+            border-radius: 8px;
+            padding: 16px;
+            margin: 16px 0;
+            position: relative;
+            color: var(--light-text);
+        }
+        
+        .code-block pre {
+            margin: 0;
+            white-space: pre-wrap;
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+            font-size: 0.9rem;
+        }
+        
+        .copy-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: var(--light-text);
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .copy-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Logo Preview */
+        .logo-preview {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 8px;
+            background-color: var(--light-gray);
+            padding: 4px;
+        }
+        
+        /* Documentation Styles */
+        .doc-section {
+            margin-bottom: 32px;
+        }
+        
+        .doc-section h3 {
+            font-size: 1.4rem;
+            margin-bottom: 16px;
+            font-weight: 600;
+            color: var(--dark-text);
+        }
+        
+        .doc-section p {
+            margin-bottom: 16px;
+            line-height: 1.7;
+            color: var(--secondary-color);
+        }
+        
+        /* Mobile Responsiveness */
+        @media (max-width: 991.98px) {
+            .sidebar {
+                width: 75px;
+                transform: translateX(0);
+            }
+            
+            .sidebar-header h5,
+            .sidebar-item span {
+                display: none;
+            }
+            
+            .sidebar-item {
+                justify-content: center;
+                padding: 15px;
+            }
+            
+            .sidebar-item i {
+                margin-right: 0;
+                font-size: 1.3rem;
+            }
+            
+            .main-content {
+                margin-left: 75px;
+            }
+            
+            .sidebar-toggle {
+                display: block;
+            }
+        }
+        
+        @media (max-width: 767.98px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: 250px;
+                z-index: 1040;
+            }
+            
+            .sidebar.show {
+                transform: translateX(0);
+            }
+            
+            .sidebar-header h5,
+            .sidebar-item span {
+                display: block;
+            }
+            
+            .sidebar-item {
+                justify-content: flex-start;
+                padding: 14px 20px;
+            }
+            
+            .sidebar-item i {
+                margin-right: 14px;
+            }
+            
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+            }
+            
+            .mobile-header {
+                display: flex;
+                align-items: center;
+                padding: 15px 20px;
+                background-color: var(--dark-bg);
+                position: sticky;
+                top: 0;
+                z-index: 1020;
+            }
+            
+            .mobile-header h5 {
+                color: var(--light-text);
+                margin: 0 0 0 15px;
+                font-size: 1.1rem;
+            }
+            
+            .form-control, .form-select {
+                padding: 10px 14px;
+            }
+            
+            .btn {
+                padding: 8px 16px;
+            }
+            
+            .header h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Mobile Header (visible only on small screens) -->
+    <div class="mobile-header d-md-none">
+        <button class="sidebar-toggle">
+            <i class="bi bi-list"></i>
+        </button>
+        <h5>LLM Data Platform</h5>
+    </div>
+
+    <div class="container-fluid p-0">
+        <div class="row g-0">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <div class="sidebar-header">
+                    <h5>LLM Data Platform</h5>
+                    <button class="sidebar-toggle d-none d-md-block d-lg-none">
+                        <i class="bi bi-arrow-left"></i>
+                    </button>
+                </div>
+                
+                <a href="main.html" class="sidebar-item active">
+                    <i class="bi bi-plus-circle"></i> <span>Create Agent</span>
+                </a>
+                <a href="bots.html" class="sidebar-item">
+                    <i class="bi bi-robot"></i> <span>My Bots</span>
+                </a>
+                
+                <a href="account.html" class="sidebar-item">
+                    <i class="bi bi-person-circle"></i> <span>My Account</span>
+                </a>
+                <a href="files.html" class="sidebar-item">
+                    <i class="bi bi-file-earmark"></i> <span>Files</span>
+                </a>
+                <a href="text.html" class="sidebar-item">
+                    <i class="bi bi-text-paragraph"></i> <span>Text</span>
+                </a>
+                <a href="website.html" class="sidebar-item">
+                    <i class="bi bi-globe"></i> <span>Website</span>
+                </a>
+                <a href="qa.html" class="sidebar-item">
+                    <i class="bi bi-chat-dots"></i> <span>Q&A</span>
+                </a>
+
+                <a href="documentation.html" class="sidebar-item">
+                    <i class="bi bi-book"></i> <span>Documentation</span>
+                </a>
+                <a href="#" class="sidebar-item" id="sidebarProBtn">
+                    <i class="bi bi-crown"></i> <span>Pro Version</span>
+                </a>
+            </div>
+            
+            <!-- Main Content Area -->
+            <div class="main-content">
+                <!-- Pro/Standard Version Buttons -->
+                <div class="d-flex justify-content-center mb-4">
+                    <a href="main.html" class="btn btn-light me-3 px-5">Standard</a>
+                    <button id="openFlowiseBtn" class="btn btn-dark px-5">
+                        <i class="bi bi-crown"></i> Pro Version
+                    </button>
+                </div>
+                
+                <!-- Create Agent Section -->
+                <div class="header">
+                    <h1>Create new agent</h1>
+                </div>
+                        
+                        <!-- Agent Creation Form -->
+                        <div class="row">
+                            <div class="col-lg-8">
+                                <div class="card mb-4">
+                                    <div class="card-body">
+                                        <form id="createAgentForm">
+                                            <div class="mb-3">
+                                                <label for="agentName" class="form-label">Agent Name</label>
+                                                <input type="text" class="form-control" id="agentName" placeholder="My AI Assistant">
+                                            </div>
+                                            
+                                            <div class="mb-3">
+                                                <label for="agentDescription" class="form-label">Agent Description</label>
+                                                <textarea class="form-control" id="agentDescription" rows="2" placeholder="A helpful AI assistant powered by my data"></textarea>
+                                            </div>
+                                            
+                                            <div class="mb-3">
+                                                <label for="agentLogo" class="form-label">Upload Logo</label>
+                                                <input type="file" class="form-control" id="agentLogo" accept="image/*">
+                                                <div id="logoPreviewContainer" class="mt-2 d-none">
+                                                    <div class="d-flex align-items-center">
+                                                        <img id="logoPreview" src="" alt="Logo Preview" style="max-width: 100px; max-height: 100px;" class="me-2">
+                                                        <button type="button" id="removeLogo" class="btn btn-sm btn-outline-danger">Remove</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="mb-3">
+                                                <label class="form-label">Chat Widget Settings</label>
+                                                <div class="row g-3">
+                                                    <div class="col-md-6">
+                                                        <label for="primaryColor" class="form-label">Primary Color</label>
+                                                        <input type="color" class="form-control form-control-color w-100" id="primaryColor" value="#0d6efd">
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label for="chatPosition" class="form-label">Widget Position</label>
+                                                        <select class="form-select" id="chatPosition">
+                                                            <option value="bottom-right">Bottom Right</option>
+                                                            <option value="bottom-left">Bottom Left</option>
+                                                            <option value="top-right">Top Right</option>
+                                                            <option value="top-left">Top Left</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="d-grid">
+                                                <button type="submit" class="btn btn-primary">Create Agent</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-lg-4">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">Sources</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row g-2">
+                                            <div class="col-6">
+                                                <div class="source-counter">
+                                                    <h5>Files</h5>
+                                                    <div class="count" id="filesCount">0</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div class="source-counter">
+                                                    <h5>Text</h5>
+                                                    <div class="count" id="textCount">0</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div class="source-counter">
+                                                    <h5>Websites</h5>
+                                                    <div class="count" id="websitesCount">0</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div class="source-counter">
+                                                    <h5>Total Size</h5>
+                                                    <div class="count" id="totalSize">0 KB</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Storage Monitor will be inserted here -->
+                                        <div id="storageMonitorPlaceholder" class="mt-4"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Agent Code Snippets -->
+                        <div id="agentCodeSnippets" class="d-none mt-4">
+                            <div class="alert alert-success">
+                                <h5>Agent Created Successfully!</h5>
+                                <p>Use the code below to integrate the chat widget into your website.</p>
+                            </div>
+                            
+                            <div class="card mb-3">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <span>Integration Code</span>
+                                    <button class="btn btn-sm btn-outline-secondary copy-btn" data-target="integrationCode">Copy</button>
+                                </div>
+                                <div class="card-body">
+                                    <pre class="bg-light p-3 rounded mb-0"><code id="integrationCode"></code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    
+    <!-- Initialize Firebase BEFORE auth-check.js -->
+    <script>
+    // Use the actual Firebase config from login.html
+    const firebaseConfig = {
+      apiKey: "AIzaSyAOKeEnQuV_bkKXq7lE08tEZ-S7CuAHXlw",
+      authDomain: "swipies-ai.firebaseapp.com",
+      projectId: "swipies-ai",
+      storageBucket: "swipies-ai.firebasestorage.app",
+      messagingSenderId: "705282430100",
+      appId: "1:705282430100:web:bc179e131a6dea6b6f5081",
+      measurementId: "G-E7MF4TNZ5T"
+    };
+    
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    
+    // Signal that Firebase is initialized
+    window.firebaseInitialized = true;
+    window.dispatchEvent(new Event('firebaseInitialized'));
+    </script>
+    
+    <!-- Super simple auth check -->
+    <script src="js/auth-super-simple.js"></script>
+    
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Marked.js for Markdown parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Platform Common JS -->
+    <script src="js/platform-common.js"></script>
+    <!-- API Handler -->
+    <script src="js/api-handler.js"></script>
+    <!-- Storage Monitor Component -->
+    <script src="js/storage-monitor.js"></script>
+    <!-- Custom JS (with correct path) -->
+    <script src="js/main.js"></script>
+    
+    <!-- Flowise Pro Integration -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let flowiseStarting = false;
+
+            // Function to open Flowise Pro Version
+            function openFlowisePro() {
+                if (flowiseStarting) {
+                    alert('Flowise is already starting. Please wait...');
+                    return;
+                }
+
+                // Disable buttons and show loading state
+                const openFlowiseBtn = document.getElementById('openFlowiseBtn');
+                const sidebarProBtn = document.getElementById('sidebarProBtn');
+                if (openFlowiseBtn) openFlowiseBtn.disabled = true;
+                if (sidebarProBtn) sidebarProBtn.classList.add('disabled');
+                
+                // Show starting notification
+                const notification = document.createElement('div');
+                notification.className = 'position-fixed bottom-0 end-0 p-3';
+                notification.style.zIndex = '9999';
+                notification.innerHTML = `
+                    <div class="toast show" role="alert">
+                        <div class="toast-header bg-dark text-white">
+                            <i class="bi bi-crown me-2"></i>
+                            <strong class="me-auto">Pro Version</strong>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+                        </div>
+                        <div class="toast-body">
+                            <div class="d-flex align-items-center">
+                                <div class="spinner-border spinner-border-sm text-primary me-2" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <span>Starting Flowise AI Pro Version...</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(notification);
+                
+                // Start Flowise first
+                flowiseStarting = true;
+                fetch('/api/start-flowise', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        userId: firebase.auth().currentUser ? firebase.auth().currentUser.uid : localStorage.getItem('userId')
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Wait for Flowise to start by checking health endpoint
+                    checkFlowiseStatus(notification, openFlowiseBtn, sidebarProBtn);
+                })
+                .catch(error => {
+                    console.warn('Error starting Flowise:', error);
+                    notification.innerHTML = `
+                        <div class="toast show" role="alert">
+                            <div class="toast-header bg-danger text-white">
+                                <i class="bi bi-exclamation-triangle me-2"></i>
+                                <strong class="me-auto">Error</strong>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+                            </div>
+                            <div class="toast-body">
+                                Failed to start Flowise: ${error.message}
+                            </div>
+                        </div>
+                    `;
+                    // Re-enable buttons
+                    if (openFlowiseBtn) openFlowiseBtn.disabled = false;
+                    if (sidebarProBtn) sidebarProBtn.classList.remove('disabled');
+                    flowiseStarting = false;
+                });
+            }
+
+            // Function to check if Flowise is running
+            function checkFlowiseStatus(notification, openFlowiseBtn, sidebarProBtn, retries = 0) {
+                // Max retries (30 seconds)
+                if (retries > 30) {
+                    notification.innerHTML = `
+                        <div class="toast show" role="alert">
+                            <div class="toast-header bg-warning text-dark">
+                                <i class="bi bi-exclamation-triangle me-2"></i>
+                                <strong class="me-auto">Timeout</strong>
+                                <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+                            </div>
+                            <div class="toast-body">
+                                Flowise is taking longer than expected to start. You can try refreshing or manually accessing <a href="http://localhost:3000" target="_blank">http://localhost:3000</a>
+                            </div>
+                        </div>
+                    `;
+                    if (openFlowiseBtn) openFlowiseBtn.disabled = false;
+                    if (sidebarProBtn) sidebarProBtn.classList.remove('disabled');
+                    flowiseStarting = false;
+                    return;
+                }
+                
+                // Try to reach Flowise
+                fetch('http://localhost:3000/health', { 
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' },
+                })
+                .then(response => {
+                    if (response.ok) {
+                        // Flowise is running now, open it
+                        notification.innerHTML = `
+                            <div class="toast show" role="alert">
+                                <div class="toast-header bg-success text-white">
+                                    <i class="bi bi-check-circle me-2"></i>
+                                    <strong class="me-auto">Success</strong>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+                                </div>
+                                <div class="toast-body">
+                                    Flowise started successfully! Opening Pro Version...
+                                </div>
+                            </div>
+                        `;
+                        
+                        // Open Flowise in a new window
+                        window.open('http://localhost:3000', '_blank');
+                        
+                        // Re-enable buttons
+                        if (openFlowiseBtn) openFlowiseBtn.disabled = false;
+                        if (sidebarProBtn) sidebarProBtn.classList.remove('disabled');
+                        flowiseStarting = false;
+                        
+                        // Remove notification after 3 seconds
+                        setTimeout(() => {
+                            notification.remove();
+                        }, 3000);
+                    } else {
+                        // Not ready yet, try again
+                        setTimeout(() => {
+                            checkFlowiseStatus(notification, openFlowiseBtn, sidebarProBtn, retries + 1);
+                        }, 1000);
+                    }
+                })
+                .catch(error => {
+                    // Not ready yet, try again
+                    setTimeout(() => {
+                        checkFlowiseStatus(notification, openFlowiseBtn, sidebarProBtn, retries + 1);
+                    }, 1000);
+                });
+            }
+
+            // Pro version button in header - starts Flowise first
+            const openFlowiseBtn = document.getElementById('openFlowiseBtn');
+            if (openFlowiseBtn) {
+                openFlowiseBtn.addEventListener('click', openFlowisePro);
+            }
+            
+            // Pro version button in sidebar - starts Flowise first
+            const sidebarProBtn = document.getElementById('sidebarProBtn');
+            if (sidebarProBtn) {
+                sidebarProBtn.addEventListener('click', openFlowisePro);
+            }
+        });
+    </script>
+</body>
+</html>

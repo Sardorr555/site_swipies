@@ -34,10 +34,25 @@
     </aside>
   
     <main class="main">
-      <div id="files" class="tab-content active">
-        <h2>Files</h2>
-        <p>Загрузка файлов, PDF, DOC и т.д.</p>
-      </div>
+
+      
+
+      
+            <!-- File Upload Section -->
+            <div id="files"class="col-md-6">
+              <div class="section">
+                  <h3>File Upload</h3>
+                  <form id="fileUploadForm">
+                      <div class="mb-3">
+                          <label for="fileInput" class="form-label">Select a file (PDF, TXT, DOCX)</label>
+                          <input type="file" class="form-control" id="fileInput" accept=".pdf,.txt,.docx">
+                      </div>
+                      <button type="submit" class="btn btn-primary">Upload</button>
+                  </form>
+                  <div id="fileUploadStatus" class="mt-3"></div>
+              </div>
+          </div>
+          
   
       
     <div id="text" class="tab-content">

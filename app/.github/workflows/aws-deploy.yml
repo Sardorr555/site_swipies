@@ -1,0 +1,68 @@
+name: Deploy to AWS
+
+on:
+  push:
+    branches:
+      - main  # Or the branch you want to deploy from
+  workflow_dispatch:  # Allows manual triggering
+
+env:
+  NODE_VERSION: '18'  # Match your project's Node version
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: |
+          npm ci
+          cd functions && npm ci && cd ..
+          
+      - name: Run linting and tests
+        run: |
+          npm run lint || true  # Add proper testing command if available
+          cd functions && npm run lint && cd ..
+          
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          
+      - name: Create .env file
+        run: |
+          echo "PORT=${{ secrets.PORT }}" > .env
+          echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" >> .env
+          echo "FIREBASE_API_KEY=${{ secrets.FIREBASE_API_KEY }}" >> .env
+          # Add other environment variables as needed
+          
+      - name: Build application
+        run: |
+          npm run build || true  # Add your build command if available
+          
+      - name: Create deployment package
+        run: |
+          zip -r deploy.zip . -x "node_modules/*" -x ".git/*" -x ".github/*"
+          
+      - name: Deploy to AWS EC2
+        run: |
+          aws s3 cp deploy.zip s3://${{ secrets.AWS_S3_BUCKET }}/llm-data-platform/deploy.zip
+          aws ec2 send-command \
+            --instance-ids ${{ secrets.AWS_INSTANCE_ID }} \
+            --document-name "AWS-RunShellScript" \
+            --parameters commands=["cd /var/www/llm-data-platform", \
+                                  "aws s3 cp s3://${{ secrets.AWS_S3_BUCKET }}/llm-data-platform/deploy.zip .", \
+                                  "unzip -o deploy.zip", \
+                                  "npm ci", \
+                                  "pm2 restart llm-data-platform || pm2 start server.js --name llm-data-platform"]

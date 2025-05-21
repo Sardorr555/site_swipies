@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login | LLM Data Platform</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #f8f9fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        .login-container {
+            width: 100%;
+            max-width: 420px;
+            padding: 32px;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        }
+        
+        .login-logo {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        
+        .login-logo img {
+            height: 60px;
+        }
+        
+        h2 {
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 24px;
+            color: #212529;
+        }
+        
+        form {
+            margin-bottom: 20px;
+        }
+        
+        .form-control {
+            font-size: 16px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+        
+        .btn {
+            padding: 12px 16px;
+            font-weight: 500;
+            border-radius: 8px;
+        }
+        
+        .google-btn {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            padding: 12px 16px;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            color: #555;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .google-btn:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .link {
+            text-align: center;
+            margin-top: 20px;
+            color: #6c757d;
+        }
+        
+        .link a {
+            color: #0d6efd;
+            text-decoration: none;
+        }
+        
+        .link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-container">
+    <div class="login-logo">
+        <h1>LLM Data Platform</h1>
+    </div>
+    
+    <h2>Sign In</h2>
+    
+    <form id="loginForm">
+        <div class="mb-3">
+            <input type="email" class="form-control" id="emailInput" placeholder="Email address" required>
+        </div>
+        <div class="mb-3">
+            <input type="password" class="form-control" id="passwordInput" placeholder="Password" required>
+        </div>
+        <button type="submit" class="btn btn-primary w-100 mb-3">Sign In</button>
+    </form>
+
+    <button class="google-btn" onclick="loginWithGoogle()">
+        <i class="bi bi-google"></i> Continue with Google
+    </button>
+
+    <div class="link">
+        Don't have an account? <a href="signup.html">Sign up</a>
+    </div>
+</div>
+
+<!-- No auth check needed on login page -->
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+<!-- Firebase Config -->
+<script>
+// Flag to indicate we're on login page
+
+// Direct initialization with Firebase config
+const firebaseConfig = {
+    apiKey: "AIzaSyAOKeEnQuV_bkKXq7lE08tEZ-S7CuAHXlw",
+    authDomain: "swipies-ai.firebaseapp.com",
+    projectId: "swipies-ai",
+    storageBucket: "swipies-ai.firebasestorage.app",
+    messagingSenderId: "705282430100",
+    appId: "1:705282430100:web:bc179e131a6dea6b6f5081",
+    measurementId: "G-E7MF4TNZ5T"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+
+// Set persistence to local (browser persistence)
+firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+
+// Handle login page functionality
+document.addEventListener('DOMContentLoaded', function() {
+    // One-time check for login status (no loops)
+    if (firebase.auth().currentUser) {
+        console.log("User already logged in, redirecting to main page");
+        handleSuccessfulLogin();
+        return;
+    }
+    
+    // Check once for existing login and immediately unsubscribe
+    const unsubscribe = firebase.auth().onAuthStateChanged(function(user) {
+        // Unsubscribe immediately
+        unsubscribe();
+        
+        if (user) {
+            console.log("User already logged in, redirecting to main page");
+            handleSuccessfulLogin();
+        }
+    });
+    
+    // Email/Password Login
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const email = document.getElementById('emailInput').value;
+        const password = document.getElementById('passwordInput').value;
+        
+        // Show login in progress
+        document.getElementById('loginForm').innerHTML = '<div class="text-center"><div class="spinner-border text-primary" role="status"></div><p class="mt-2">Logging in...</p></div>';
+        
+        // Login with Firebase
+        firebase.auth().signInWithEmailAndPassword(email, password)
+            .then(function() {
+                handleSuccessfulLogin();
+            })
+            .catch(function(error) {
+                console.error("Login error:", error);
+                alert("Login error: " + error.message);
+                // Restore login form without page reload
+                resetLoginForm();
+            });
+    });
+});
+
+// Reset login form without refreshing
+function resetLoginForm() {
+    const formContainer = document.getElementById('loginForm');
+    formContainer.innerHTML = `
+        <div class="mb-3">
+            <input type="email" class="form-control" id="emailInput" placeholder="Email address" required>
+        </div>
+        <div class="mb-3">
+            <input type="password" class="form-control" id="passwordInput" placeholder="Password" required>
+        </div>
+        <button type="submit" class="btn btn-primary w-100 mb-3">Sign In</button>
+    `;
+}
+
+// Handle successful login with redirect
+function handleSuccessfulLogin() {
+    // Set user logged in flag for auth checks
+    localStorage.setItem('userLoggedIn', 'true');
+    
+    // Store basic user data
+    const user = firebase.auth().currentUser;
+    if (user) {
+        const userData = {
+            uid: user.uid,
+            email: user.email,
+            displayName: user.displayName || ''
+        };
+        localStorage.setItem('userData', JSON.stringify(userData));
+    }
+    
+    // Clear any auth check skipFlags
+    sessionStorage.removeItem('skipAuthCheck');
+    
+    // Get the redirect URL from session storage
+    const redirectAfterLogin = sessionStorage.getItem('redirectAfterLogin');
+    sessionStorage.removeItem('redirectAfterLogin');
+    
+    console.log('User logged in, redirecting to:', redirectAfterLogin || 'main.html');
+    
+    // Redirect to the return URL or main page
+    window.location.href = redirectAfterLogin || 'main.html';
+}
+
+// Google Login
+window.loginWithGoogle = function() {
+    // Show login in progress
+    document.getElementById('loginForm').innerHTML = '<div class="text-center"><div class="spinner-border text-primary" role="status"></div><p class="mt-2">Logging in with Google...</p></div>';
+    
+    const provider = new firebase.auth.GoogleAuthProvider();
+    
+    firebase.auth().signInWithPopup(provider)
+        .then(function() {
+            handleSuccessfulLogin();
+        })
+        .catch(function(error) {
+            console.error("Google login error:", error);
+            alert("Google login error: " + error.message);
+            // Restore login form without page reload
+            resetLoginForm();
+        });
+};
+</script>
+
+</body>
+</html>

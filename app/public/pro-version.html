@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM Data Platform - Pro Version</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+    
+    <!-- Super simple auth check -->
+    <script src="js/auth-super-simple.js"></script>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
+    
+    <!-- Firebase Config -->
+    <script>
+        // Initialize Firebase (replace with your Firebase config)
+        const firebaseConfig = {
+            apiKey: "AIzaSyDjFCg6_HRlBR5-WprX0cAsB8sNKkGXpCM",
+            authDomain: "llm-data-platform.firebaseapp.com",
+            projectId: "llm-data-platform",
+            storageBucket: "llm-data-platform.appspot.com",
+            messagingSenderId: "935655015309",
+            appId: "1:935655015309:web:0ca81cb6d778e0d4bf6d54"
+        };
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        
+        // Signal that Firebase is initialized
+        window.firebaseInitialized = true;
+        window.dispatchEvent(new Event('firebaseInitialized'));
+    </script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="main.html">
+                <i class="fas fa-brain me-2"></i>LLM Data Platform
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="main.html">
+                            <i class="fas fa-home me-1"></i>Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="qa.html">
+                            <i class="fas fa-question-circle me-1"></i>Q&A
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="pro-version.html">
+                            <i class="fas fa-crown me-1"></i>Pro Version
+                        </a>
+                    </li>
+                </ul>
+                <div class="d-flex">
+                    <div class="user-info text-white me-3">
+                        <i class="fas fa-user me-1"></i>
+                        <span id="userEmail">Loading...</span>
+                    </div>
+                    <button id="logoutBtn" class="btn btn-outline-light btn-sm">
+                        <i class="fas fa-sign-out-alt me-1"></i>Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container my-5">
+        <div class="row">
+            <div class="col-12 text-center mb-4">
+                <h1 class="display-4">
+                    <i class="fas fa-crown text-warning me-3"></i>
+                    LLM Data Platform Pro
+                    <i class="fas fa-crown text-warning ms-3"></i>
+                </h1>
+                <p class="lead">Advanced Flow-Based LLM Integration with Flowise AI</p>
+            </div>
+        </div>
+
+        <div class="row mb-5">
+            <div class="col-md-6">
+                <div class="card h-100 border-primary">
+                    <div class="card-header bg-primary text-white">
+                        <h3><i class="fas fa-cogs me-2"></i>Features</h3>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">
+                                <i class="fas fa-check-circle text-success me-2"></i>
+                                Visual Flow Builder for LLM Pipelines
+                            </li>
+                            <li class="list-group-item">
+                                <i class="fas fa-check-circle text-success me-2"></i>
+                                Drag-and-Drop Interface
+                            </li>
+                            <li class="list-group-item">
+                                <i class="fas fa-check-circle text-success me-2"></i>
+                                Multiple LLM Providers Support
+                            </li>
+                            <li class="list-group-item">
+                                <i class="fas fa-check-circle text-success me-2"></i>
+                                Pre-Built Components
+                            </li>
+                            <li class="list-group-item">
+                                <i class="fas fa-check-circle text-success me-2"></i>
+                                Advanced Rug Pull Customization
+                            </li>
+                            <li class="list-group-item">
+                                <i class="fas fa-check-circle text-success me-2"></i>
+                                API Endpoints for Your Flows
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card h-100 border-success">
+                    <div class="card-header bg-success text-white">
+                        <h3><i class="fas fa-rocket me-2"></i>Get Started</h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">
+                            Flowise AI is an open-source UI visual builder that lets you build your customized LLM flow using draggable components and connect them together.
+                        </p>
+                        <p class="card-text">
+                            With our Pro integration, your data manipulations and rug pulls can be combined with Flowise's powerful flow capabilities.
+                        </p>
+                        <div class="d-grid gap-2 mt-4">
+                            <a href="https://github.com/FlowiseAI/Flowise" target="_blank" class="btn btn-lg btn-primary">
+                                <i class="fab fa-github me-2"></i>View on GitHub
+                            </a>
+                            <button id="launchFlowiseBtn" class="btn btn-lg btn-success">
+                                <i class="fas fa-play-circle me-2"></i>Launch Flowise Integration
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+                <div class="card border-info">
+                    <div class="card-header bg-info text-white">
+                        <h3><i class="fas fa-info-circle me-2"></i>About Flowise Integration</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h4>What can you build?</h4>
+                                <ul>
+                                    <li>Custom chatbots with memory</li>
+                                    <li>Document-based Q&A systems</li>
+                                    <li>Complex Rug Pull workflows with visual feedback</li>
+                                    <li>Multi-step content manipulation pipelines</li>
+                                    <li>API endpoints for your LLM applications</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h4>How it works</h4>
+                                <ol>
+                                    <li>Click "Launch Flowise Integration"</li>
+                                    <li>Build your flow with drag-and-drop components</li>
+                                    <li>Connect your data sources from LLM Data Platform</li>
+                                    <li>Create custom rug pull nodes for data manipulation</li>
+                                    <li>Deploy your flow as an API or embed it in your app</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-5">
+            <div class="col-12">
+                <div id="flowiseFrame" class="d-none">
+                    <div class="alert alert-info mb-3">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Your Flowise instance is launching. You can build and save your flows here.
+                    </div>
+                    <div class="ratio ratio-16x9">
+                        <iframe id="flowiseIframe" src="about:blank" allowfullscreen></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-light py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>LLM Data Platform</h5>
+                    <p>Advanced data manipulation and contextual rug pull capabilities for LLMs.</p>
+                </div>
+                <div class="col-md-3">
+                    <h5>Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="main.html" class="text-light">Home</a></li>
+                        <li><a href="qa.html" class="text-light">Q&A</a></li>
+                        <li><a href="pro-version.html" class="text-light">Pro Version</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5>Resources</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="https://github.com/FlowiseAI/Flowise" class="text-light">Flowise GitHub</a></li>
+                        <li><a href="https://docs.flowiseai.com/" class="text-light">Flowise Documentation</a></li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="mt-3 mb-2">
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <p class="mb-0">&copy; 2025 LLM Data Platform. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Auth check script - Make sure users are logged in -->
+    <script src="js/auth-check.js"></script>
+    
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Pro Version JS -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Flowise launch functionality
+            const launchBtn = document.getElementById('launchFlowiseBtn');
+            const flowiseFrame = document.getElementById('flowiseFrame');
+            const flowiseIframe = document.getElementById('flowiseIframe');
+            let flowiseRunning = false;
+            
+            if (launchBtn) {
+                launchBtn.addEventListener('click', function() {
+                    if (!flowiseRunning) {
+                        // Launch Flowise if it's not already running
+                        launchBtn.disabled = true;
+                        launchBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Starting Flowise...';
+                        
+                        // Call our API to start Flowise
+                        fetch('/api/start-flowise', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                userId: firebase.auth().currentUser ? firebase.auth().currentUser.uid : null
+                            }),
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                flowiseRunning = true;
+                                checkFlowiseStatus();
+                            } else {
+                                launchBtn.disabled = false;
+                                launchBtn.innerHTML = '<i class="fas fa-play-circle me-2"></i>Launch Flowise Integration';
+                                alert('Failed to start Flowise: ' + data.error);
+                            }
+                        })
+                        .catch(error => {
+                            launchBtn.disabled = false;
+                            launchBtn.innerHTML = '<i class="fas fa-play-circle me-2"></i>Launch Flowise Integration';
+                            alert('Error connecting to server: ' + error.message);
+                            
+                            // Fallback: direct user to launch manually
+                            if (confirm('Server connection failed. Would you like to open Flowise directly?')) {
+                                window.open('http://localhost:3000', '_blank');
+                            }
+                        });
+                    } else {
+                        // Toggle iframe visibility if Flowise is running
+                        if (flowiseFrame.classList.contains('d-none')) {
+                            flowiseFrame.classList.remove('d-none');
+                            flowiseIframe.src = "http://localhost:3000"; // Default Flowise port
+                            launchBtn.innerHTML = '<i class="fas fa-times-circle me-2"></i>Close Flowise';
+                        } else {
+                            flowiseFrame.classList.add('d-none');
+                            flowiseIframe.src = "about:blank";
+                            launchBtn.innerHTML = '<i class="fas fa-external-link-alt me-2"></i>Open Flowise';
+                        }
+                    }
+                });
+            }
+            
+            // Function to check if Flowise is running
+            function checkFlowiseStatus() {
+                fetch('http://localhost:3000/health', { 
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                })
+                .then(response => {
+                    if (response.ok) {
+                        // Flowise is running
+                        flowiseRunning = true;
+                        flowiseFrame.classList.remove('d-none');
+                        flowiseIframe.src = "http://localhost:3000";
+                        launchBtn.disabled = false;
+                        launchBtn.innerHTML = '<i class="fas fa-times-circle me-2"></i>Close Flowise';
+                    } else {
+                        // Keep checking
+                        setTimeout(checkFlowiseStatus, 2000);
+                    }
+                })
+                .catch(error => {
+                    // Flowise is not yet running, keep checking
+                    setTimeout(checkFlowiseStatus, 2000);
+                });
+            }
+            
+            // Check if Flowise is already running when page loads
+            fetch('http://localhost:3000/health', { 
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                timeout: 1000
+            })
+            .then(response => {
+                if (response.ok) {
+                    flowiseRunning = true;
+                    launchBtn.innerHTML = '<i class="fas fa-external-link-alt me-2"></i>Open Flowise';
+                }
+            })
+            .catch(error => {
+                // Flowise is not running, button stays as 'Launch'
+            });
+            
+            // Also add a direct link to open Flowise in a new tab
+            const directLinkBtn = document.createElement('button');
+            directLinkBtn.className = 'btn btn-sm btn-outline-primary mt-2 ms-2';
+            directLinkBtn.innerHTML = '<i class="fas fa-external-link-alt me-1"></i> Open in New Tab';
+            directLinkBtn.addEventListener('click', function() {
+                window.open('http://localhost:3000', '_blank');
+            });
+            launchBtn.parentNode.appendChild(directLinkBtn);
+        });
+            
+            // Logout functionality
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function() {
+                    if (confirm('Are you sure you want to log out?')) {
+                        firebase.auth().signOut().then(() => {
+                            // Sign-out successful, redirect to login page
+                            window.location.href = 'login.html';
+                        }).catch((error) => {
+                            // An error happened
+                            console.error('Logout error:', error);
+                            alert('Failed to log out. Please try again.');
+                        });
+                    }
+                });
+            }
+            
+            // Display user email
+            firebase.auth().onAuthStateChanged(function(user) {
+                const userEmailElement = document.getElementById('userEmail');
+                if (user && userEmailElement) {
+                    userEmailElement.textContent = user.email;
+                }
+            });
+        });
+    </script>
+</body>
+</html>
