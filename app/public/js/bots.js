@@ -39,8 +39,8 @@ if (typeof firebase !== 'undefined' && firebase.auth) {
   console.log('Firebase not available, using local user ID:', userId);
 }
 
-// API endpoint
-const API_BASE_URL = 'http://localhost:3000/api';
+// API endpoint defined in api-handler.js
+// We'll use window.api to communicate with the server
 
 // Track current bot ID for modal operations
 let currentBotId = null;
@@ -102,25 +102,24 @@ async function loadBots() {
     const botCards = botsListElement.querySelectorAll('.bot-card-container');
     botCards.forEach(card => card.remove());
     
-    // Attempt to fetch user's bots from the API
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
-    
+    // Attempt to fetch user's bots from the API using our API handler
     try {
       console.log('Fetching bots for user:', userId);
-      const response = await fetch(`${API_BASE_URL}/bots?userId=${userId}`, {
-        signal: controller.signal
-      });
       
-      clearTimeout(timeoutId);
-      
-      if (!response.ok) {
-        throw new Error(`API error: ${response.status}`);
+      // Check if API handler is available
+      if (window.api && window.api.getUserBots) {
+        const result = await window.api.getUserBots();
+        
+        if (result.error) {
+          throw new Error(result.error);
+        }
+        
+        botsData = result.bots || [];
+        console.log('Received bots data:', botsData.length, 'bots');
+      } else {
+        console.error('API handler not available');
+        botsData = [];
       }
-      
-      const result = await response.json();
-      botsData = result.bots || [];
-      console.log('Received bots data:', botsData.length, 'bots');
     } catch (fetchError) {
       console.error('Error fetching bots:', fetchError.message);
       // If API fetch fails, set empty array to show the no bots message

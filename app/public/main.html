@@ -503,20 +503,12 @@
                 <a href="documentation.html" class="sidebar-item">
                     <i class="bi bi-book"></i> <span>Documentation</span>
                 </a>
-                <a href="#" class="sidebar-item" id="sidebarProBtn">
-                    <i class="bi bi-crown"></i> <span>Pro Version</span>
-                </a>
+
             </div>
             
             <!-- Main Content Area -->
             <div class="main-content">
-                <!-- Pro/Standard Version Buttons -->
-                <div class="d-flex justify-content-center mb-4">
-                    <a href="main.html" class="btn btn-light me-3 px-5">Standard</a>
-                    <button id="openFlowiseBtn" class="btn btn-dark px-5">
-                        <i class="bi bi-crown"></i> Pro Version
-                    </button>
-                </div>
+
                 
                 <!-- Create Agent Section -->
                 <div class="header">
@@ -686,166 +678,6 @@
     <!-- Custom JS (with correct path) -->
     <script src="js/main.js"></script>
     
-    <!-- Flowise Pro Integration -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            let flowiseStarting = false;
 
-            // Function to open Flowise Pro Version
-            function openFlowisePro() {
-                if (flowiseStarting) {
-                    alert('Flowise is already starting. Please wait...');
-                    return;
-                }
-
-                // Disable buttons and show loading state
-                const openFlowiseBtn = document.getElementById('openFlowiseBtn');
-                const sidebarProBtn = document.getElementById('sidebarProBtn');
-                if (openFlowiseBtn) openFlowiseBtn.disabled = true;
-                if (sidebarProBtn) sidebarProBtn.classList.add('disabled');
-                
-                // Show starting notification
-                const notification = document.createElement('div');
-                notification.className = 'position-fixed bottom-0 end-0 p-3';
-                notification.style.zIndex = '9999';
-                notification.innerHTML = `
-                    <div class="toast show" role="alert">
-                        <div class="toast-header bg-dark text-white">
-                            <i class="bi bi-crown me-2"></i>
-                            <strong class="me-auto">Pro Version</strong>
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
-                        </div>
-                        <div class="toast-body">
-                            <div class="d-flex align-items-center">
-                                <div class="spinner-border spinner-border-sm text-primary me-2" role="status">
-                                    <span class="visually-hidden">Loading...</span>
-                                </div>
-                                <span>Starting Flowise AI Pro Version...</span>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                document.body.appendChild(notification);
-                
-                // Start Flowise first
-                flowiseStarting = true;
-                fetch('/api/start-flowise', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        userId: firebase.auth().currentUser ? firebase.auth().currentUser.uid : localStorage.getItem('userId')
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    // Wait for Flowise to start by checking health endpoint
-                    checkFlowiseStatus(notification, openFlowiseBtn, sidebarProBtn);
-                })
-                .catch(error => {
-                    console.warn('Error starting Flowise:', error);
-                    notification.innerHTML = `
-                        <div class="toast show" role="alert">
-                            <div class="toast-header bg-danger text-white">
-                                <i class="bi bi-exclamation-triangle me-2"></i>
-                                <strong class="me-auto">Error</strong>
-                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
-                            </div>
-                            <div class="toast-body">
-                                Failed to start Flowise: ${error.message}
-                            </div>
-                        </div>
-                    `;
-                    // Re-enable buttons
-                    if (openFlowiseBtn) openFlowiseBtn.disabled = false;
-                    if (sidebarProBtn) sidebarProBtn.classList.remove('disabled');
-                    flowiseStarting = false;
-                });
-            }
-
-            // Function to check if Flowise is running
-            function checkFlowiseStatus(notification, openFlowiseBtn, sidebarProBtn, retries = 0) {
-                // Max retries (30 seconds)
-                if (retries > 30) {
-                    notification.innerHTML = `
-                        <div class="toast show" role="alert">
-                            <div class="toast-header bg-warning text-dark">
-                                <i class="bi bi-exclamation-triangle me-2"></i>
-                                <strong class="me-auto">Timeout</strong>
-                                <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
-                            </div>
-                            <div class="toast-body">
-                                Flowise is taking longer than expected to start. You can try refreshing or manually accessing <a href="http://localhost:3000" target="_blank">http://localhost:3000</a>
-                            </div>
-                        </div>
-                    `;
-                    if (openFlowiseBtn) openFlowiseBtn.disabled = false;
-                    if (sidebarProBtn) sidebarProBtn.classList.remove('disabled');
-                    flowiseStarting = false;
-                    return;
-                }
-                
-                // Try to reach Flowise
-                fetch('http://localhost:3000/health', { 
-                    method: 'GET',
-                    headers: { 'Content-Type': 'application/json' },
-                })
-                .then(response => {
-                    if (response.ok) {
-                        // Flowise is running now, open it
-                        notification.innerHTML = `
-                            <div class="toast show" role="alert">
-                                <div class="toast-header bg-success text-white">
-                                    <i class="bi bi-check-circle me-2"></i>
-                                    <strong class="me-auto">Success</strong>
-                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
-                                </div>
-                                <div class="toast-body">
-                                    Flowise started successfully! Opening Pro Version...
-                                </div>
-                            </div>
-                        `;
-                        
-                        // Open Flowise in a new window
-                        window.open('http://localhost:3000', '_blank');
-                        
-                        // Re-enable buttons
-                        if (openFlowiseBtn) openFlowiseBtn.disabled = false;
-                        if (sidebarProBtn) sidebarProBtn.classList.remove('disabled');
-                        flowiseStarting = false;
-                        
-                        // Remove notification after 3 seconds
-                        setTimeout(() => {
-                            notification.remove();
-                        }, 3000);
-                    } else {
-                        // Not ready yet, try again
-                        setTimeout(() => {
-                            checkFlowiseStatus(notification, openFlowiseBtn, sidebarProBtn, retries + 1);
-                        }, 1000);
-                    }
-                })
-                .catch(error => {
-                    // Not ready yet, try again
-                    setTimeout(() => {
-                        checkFlowiseStatus(notification, openFlowiseBtn, sidebarProBtn, retries + 1);
-                    }, 1000);
-                });
-            }
-
-            // Pro version button in header - starts Flowise first
-            const openFlowiseBtn = document.getElementById('openFlowiseBtn');
-            if (openFlowiseBtn) {
-                openFlowiseBtn.addEventListener('click', openFlowisePro);
-            }
-            
-            // Pro version button in sidebar - starts Flowise first
-            const sidebarProBtn = document.getElementById('sidebarProBtn');
-            if (sidebarProBtn) {
-                sidebarProBtn.addEventListener('click', openFlowisePro);
-            }
-        });
-    </script>
 </body>
 </html>

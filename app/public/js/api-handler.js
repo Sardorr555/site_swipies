@@ -265,6 +265,7 @@ window.api = {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ settings })
   }),
+  getUserBots: () => apiRequest('/bots'),
   
   // API key management
   generateApiKey: () => apiRequest('/telegram/generate-key', {
