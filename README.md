@@ -40,13 +40,7 @@ To run the server in development mode with auto-restart:
 npm run dev
 ```
 
-### Running Flowise
 
-To start the Flowise AI platform:
-
-```bash
-npm run flowise
-```
 
 ## Features
 

@@ -69,8 +69,13 @@ function generateScriptTag(agentId, userId, settings) {
   // Convert to JSON string and escape any quotes
   const configJson = JSON.stringify(configObject).replace(/"/g, '&quot;');
   
-  // Generate the script tag with the server URL
-  return `<script src="https://llm-data-platform.yourdomain.com/js/agent-loader.js" id="${agentId}-script" data-config="${configJson}"></script>`;
+  // Generate the script tag with the correct server URL
+  // Determine if we're in development or production
+  const serverUrl = process.env.NODE_ENV === 'production' 
+    ? 'https://llm-data-platform.example.com'
+    : 'http://localhost:3002';
+    
+  return `<script src="${serverUrl}/js/agent-loader.js" id="${agentId}-script" data-config="${configJson}"></script>`;
 }
 
 /**
