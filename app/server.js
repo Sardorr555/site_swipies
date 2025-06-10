@@ -21,18 +21,53 @@ const { MAX_STORAGE_PER_CHATBOT, calculateChatbotStorageSize, checkStorageLimit,
 
 // Create Express app
 const app = express();
-// Note: Flowise uses port 3000 by default, so we'll use 3001 for our server
-const PORT = process.env.PORT || 3001;
+// Use port 3002 to avoid conflicts with the llm-data-platform
+const PORT = process.env.PORT || 3002;
+const HOST = process.env.HOST || 'localhost';
+
+console.log(`Server will start on http://${HOST}:${PORT}`);
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 
-// Serve files from the site_swipies root directory
+// Serve static files from site_swipies root directory
 app.use(express.static(path.join(__dirname, '..')));
+app.use(express.static(path.join(__dirname)));
 
-// Also serve files from the app/public directory for the LLM Data Platform
-app.use('/app', express.static(path.join(__dirname, 'public')));
+// Ensure index.html is served at the root
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'index.html'));
+});
+
+// Serve the bot creation form
+app.get('/create-bot', (req, res) => {
+  res.sendFile(path.join(__dirname, 'create-bot.html'));
+});
+
+// Serve the LLM data platform files directly
+app.use('/platform', express.static(path.join(__dirname, '..', '..', 'llm-data-platform', 'public')));
+
+// Handle platform root requests
+app.get('/platform', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', '..', 'llm-data-platform', 'public', 'main.html'));
+});
+
+// Handle specific platform pages
+app.get('/platform/:page', (req, res) => {
+  const page = req.params.page;
+  res.sendFile(path.join(__dirname, '..', '..', 'llm-data-platform', 'public', `${page}.html`));
+});
+
+// Handle the fallback case
+app.get('*', (req, res, next) => {
+  // Only handle HTML requests that aren't found
+  if (req.path.endsWith('.html') || req.path === '/') {
+    res.sendFile(path.join(__dirname, '..', 'index.html'));
+  } else {
+    next();
+  }
+});
 
 // Configure multer for file uploads
 const storage = multer.diskStorage({
@@ -406,6 +441,7 @@ app.post('/api/upload-logo', upload.single('logo'), (req, res) => {
 // ===== AGENT CREATION ENDPOINT =====
 app.post('/api/create-agent', async (req, res) => {
   try {
+    console.log('Create agent request received:', req.body);
     const { userId, settings } = req.body;
     
     if (!userId) {
@@ -417,16 +453,30 @@ app.post('/api/create-agent', async (req, res) => {
     // Generate agent code using the updated generator
     const agentData = generateAgentCode(userId, settings);
     
-    // Save agent to database
+    // Create agent record
     const agent = {
       id: uuidv4(),
       userId,
       settings: agentData.settings,
       agentId: agentData.agentId,
-      createdAt: new Date()
+      createdAt: new Date(),
+      lastModified: new Date(),
+      status: 'active'
     };
     
+    // Save to in-memory database
     db.agents.push(agent);
+    
+    // Save to Firebase if available
+    if (firebaseConfig.db) {
+      try {
+        await firebaseConfig.db.collection('agents').doc(agent.id).set(agent);
+        console.log(`Saved agent to Firebase: ${agent.id}`);
+      } catch (firebaseError) {
+        console.error('Error saving agent to Firebase:', firebaseError);
+        // Continue even if Firebase save fails
+      }
+    }
     
     console.log(`Created agent with ID: ${agent.id}`);
     
@@ -592,57 +642,59 @@ app.post('/api/telegram/generate-key', (req, res) => {
   }
 });
 
-// ===== FLOWISE AI PRO VERSION ENDPOINT =====
-app.post('/api/start-flowise', (req, res) => {
+
+
+// ===== TELEGRAM BOT CHAT ENDPOINT =====
+// ===== GET USER BOTS ENDPOINT =====
+app.get('/api/bots', async (req, res) => {
   try {
-    const { userId } = req.body;
+    const { userId } = req.query;
     
     if (!userId) {
       return res.status(400).json({ error: 'User ID is required' });
     }
     
-    console.log(`Starting Flowise AI for user ${userId}`);
+    console.log(`Fetching bots for user ${userId}`);
     
-    // Use PowerShell script to start Flowise
-    const scriptPath = path.resolve(__dirname, 'run-flowise.ps1');
+    // Filter bots by userId
+    const userBots = db.agents.filter(agent => agent.userId === userId);
     
-    if (!fs.existsSync(scriptPath)) {
-      return res.status(500).json({ error: 'Flowise starter script not found' });
+    // If Firebase is available, get bots from there
+    if (firebaseConfig.db) {
+      try {
+        const snapshot = await firebaseConfig.db.collection('agents')
+          .where('userId', '==', userId)
+          .get();
+        
+        if (!snapshot.empty) {
+          // Replace in-memory results with Firebase results
+          const firebaseBots = snapshot.docs.map(doc => doc.data());
+          console.log(`Found ${firebaseBots.length} bots in Firebase`);
+          
+          // Return bots sorted by creation date (newest first)
+          return res.status(200).json({
+            bots: firebaseBots.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+          });
+        }
+      } catch (firebaseError) {
+        console.error('Error fetching bots from Firebase:', firebaseError);
+        // Continue with in-memory results
+      }
     }
     
-    // Start Flowise with PowerShell
-    const cmd = `powershell -ExecutionPolicy Bypass -File "${scriptPath}"`;
-    
-    console.log(`Executing command: ${cmd}`);
-    
-    const { exec } = require('child_process');
-    exec(cmd, (error, stdout, stderr) => {
-      if (error) {
-        console.error(`Error starting Flowise: ${error.message}`);
-        return;
-      }
-      if (stderr) {
-        console.error(`Flowise stderr: ${stderr}`);
-      }
-      console.log(`Flowise stdout: ${stdout}`);
-    });
-    
+    // Return bots sorted by creation date (newest first)
     res.status(200).json({
-      success: true,
-      message: 'Flowise AI startup requested',
-      url: 'http://localhost:3000'
+      bots: userBots.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
     });
   } catch (error) {
-    console.error('Error starting Flowise:', error);
+    console.error('Error fetching bots:', error);
     res.status(500).json({
-      success: false,
-      error: 'Failed to start Flowise',
-      message: error.message
+      error: 'Failed to fetch bots',
+      message: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 });
 
-// ===== TELEGRAM BOT CHAT ENDPOINT =====
 app.post('/api/telegram/chat', async (req, res) => {
   try {
     const { message, telegramUserId, apiKey, chatContext } = req.body;
@@ -886,8 +938,8 @@ app.get('/app/*', (req, res) => {
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
-  console.log(`Main website available at http://localhost:${PORT}`);
-  console.log(`LLM Data Platform available at http://localhost:${PORT}/platform`);
-  console.log(`API available at http://localhost:${PORT}/api`);
+  console.log(`Server running at http://${HOST}:${PORT}`);
+  console.log(`Main website available at http://${HOST}:${PORT}`);
+  console.log(`LLM Data Platform available at http://${HOST}:${PORT}/platform`);
+  console.log(`API available at http://${HOST}:${PORT}/api`);
 });
